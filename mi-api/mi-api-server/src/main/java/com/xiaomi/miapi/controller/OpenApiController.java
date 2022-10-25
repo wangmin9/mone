@@ -207,7 +207,7 @@ public class OpenApiController {
     @RequestMapping(value = "/openDubboTest", method = RequestMethod.POST)
     @ResponseBody
     public Result<Object> openDubboTest(@RequestBody DubboTestBo dubboTestBo) throws NacosException {
-        return apiTestService.dubboTest(dubboTestBo,"testUser",99999);
+        return apiTestService.dubboTest(dubboTestBo,"testUser");
     }
 
     /**

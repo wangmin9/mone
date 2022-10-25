@@ -8,7 +8,7 @@ public class GatewayTestCaseBo {
 
     private String caseName;
 
-    private Integer accountId;
+    private String username;
 
     private Integer apiId;
 

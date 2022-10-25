@@ -6,11 +6,7 @@ import com.xiaomi.miapi.util.SessionAccount;
 import com.xiaomi.miapi.common.pojo.ApiMockExpect;
 import com.xiaomi.miapi.service.MockService;
 import com.xiaomi.miapi.service.impl.LoginService;
-import com.xiaomi.miapi.common.Consts;
 import com.xiaomi.miapi.common.Result;
-import com.xiaomi.miapi.common.exception.CommonError;
-import com.xiaomi.youpin.hermes.service.BusProjectService;
-import org.apache.dubbo.config.annotation.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,10 +35,6 @@ public class MockController {
     @Autowired
     private LoginService loginService;
 
-    @Reference(check = false, group = "${ref.hermes.service.group}")
-    private BusProjectService busProjectService;
-
-
     private static final Logger LOGGER = LoggerFactory.getLogger(MockController.class);
 
     @ResponseBody
@@ -57,11 +49,6 @@ public class MockController {
             response.sendError(401, "未登录或者无权限");
             return null;
         }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[DocumentController.getMockExpectDetail] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
-        }
-
         return mockService.getMockExpectDetail(mockExpectID);
     }
 
@@ -77,14 +64,6 @@ public class MockController {
             response.sendError(401, "未登录或者无权限");
             return null;
         }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[DocumentController.getMockExpectList] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
-        }
-        if (!busProjectService.isMember(Consts.PROJECT_NAME, projectID.longValue(), account.getUsername())) {
-            response.sendError(401, "不是项目成员");
-            return null;
-        }
         return mockService.getMockExpectList(apiID);
     }
 
@@ -92,7 +71,7 @@ public class MockController {
     @RequestMapping(value = "/deleteMockExpect", method = RequestMethod.POST)
     public Result<Boolean> deleteMockExpect(HttpServletRequest request,
                                             HttpServletResponse response,
-                                            Integer mockExpectID, Integer projectID) throws IOException {
+                                            Integer mockExpectID) throws IOException {
         SessionAccount account = loginService.getAccountFromSession(request);
 
         if (null == account) {
@@ -101,14 +80,6 @@ public class MockController {
             return null;
         }
 
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[DocumentController.deleteMockExpect] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
-        }
-        if (!busProjectService.isBusProjectAdmin(Consts.PROJECT_NAME, projectID.longValue(), account.getUsername())) {
-            response.sendError(401, "需要admin权限执行此操作");
-            return null;
-        }
         return mockService.deleteMockExpect(mockExpectID);
     }
 
@@ -116,21 +87,12 @@ public class MockController {
     @RequestMapping(value = "/enableMockExpect", method = RequestMethod.POST)
     public Result<Boolean> enableMockExpect(HttpServletRequest request,
                                             HttpServletResponse response,
-                                            Integer mockExpectID, Integer enable, Integer projectID) throws IOException {
+                                            Integer mockExpectID, Integer enable) throws IOException {
         SessionAccount account = loginService.getAccountFromSession(request);
 
         if (null == account) {
             LOGGER.warn("[MockController.enableMockExpect] current user not have valid account info in session");
             response.sendError(401, "未登录或者无权限");
-            return null;
-        }
-
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[DocumentController.enableMockExpect] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
-        }
-        if (!busProjectService.isAboveWork(Consts.PROJECT_NAME, projectID.longValue(), account.getUsername())) {
-            response.sendError(401, "需要work以上权限执行此操作");
             return null;
         }
 

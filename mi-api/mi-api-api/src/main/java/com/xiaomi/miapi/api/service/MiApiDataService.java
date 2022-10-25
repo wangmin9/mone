@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 public interface MiApiDataService {
-    Result<MiApiData> getMiApiData();
 
     Result<Map<String,List<String>>> getMiApiUserData();
 

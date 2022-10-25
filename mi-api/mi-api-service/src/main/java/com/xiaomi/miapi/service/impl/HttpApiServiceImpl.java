@@ -346,7 +346,7 @@ public class HttpApiServiceImpl implements HttpApiService {
      * 获取http接口详情
      */
     @Override
-    public Map<String, Object> getHttpApi(Integer userId, Integer projectID, Integer apiID) {
+    public Map<String, Object> getHttpApi(String username, Integer projectID, Integer apiID) {
 
         Map<String, Object> result = apiMapper.getApi(projectID, apiID);
         Map<String, Object> apiJson = JSONObject.parseObject(result.get("apiJson").toString());
@@ -378,7 +378,7 @@ public class HttpApiServiceImpl implements HttpApiService {
             apiJson.put("mockInfo", mockInfo);
         }
 
-        redis.recordRecently10Apis(userId, apiID);
+        redis.recordRecently10Apis(username, apiID);
         return apiJson;
     }
 

@@ -81,7 +81,7 @@ public class GatewayApiServiceImpl implements GatewayApiService {
     private static final Logger LOGGER = LoggerFactory.getLogger(GatewayApiServiceImpl.class);
 
     @Override
-    public Result<Map<String, Object>> getGatewayApiDetail(Integer userId, Integer projectID, Integer apiID) {
+    public Result<Map<String, Object>> getGatewayApiDetail(String username, Integer projectID, Integer apiID) {
         Map<String, Object> map = new HashMap<>();
         Api api = apiMapper.getApiInfo(projectID, apiID);
         if (null == api) {
@@ -133,7 +133,7 @@ public class GatewayApiServiceImpl implements GatewayApiService {
         String md5Location = Md5Utils.getMD5(gatewayApiInfo.getUrl());
         String uri = gatewayApiInfo.getUrl().replaceAll("/", ":");
         map.put("mockUrl", String.format(Consts.REQUEST_URL_FORMAT, Consts.MockUrlPrefix + Consts.GatewayMockPrefix, md5Location, uri));
-        redis.recordRecently10Apis(userId, apiID);
+        redis.recordRecently10Apis(username, apiID);
         return Result.success(map);
     }
 

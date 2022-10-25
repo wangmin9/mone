@@ -12,8 +12,6 @@ import com.xiaomi.miapi.service.impl.LoginService;
 import com.xiaomi.miapi.common.Consts;
 import com.xiaomi.miapi.common.Result;
 import com.xiaomi.miapi.common.exception.CommonError;
-import com.xiaomi.youpin.hermes.service.BusProjectService;
-import org.apache.dubbo.config.annotation.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,8 +53,6 @@ public class ApiController {
     @Autowired
     private LoginService loginService;
 
-    @Reference(check = false, group = "${ref.hermes.service.group}")
-    private BusProjectService busProjectService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ApiController.class);
 
@@ -81,15 +77,6 @@ public class ApiController {
         if (null == account) {
             LOGGER.warn("[AccountController.addHttpApi] current user not have valid account info in session");
             response.sendError(401, "未登录或者无权限");
-            return null;
-        }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[ProjectController.addProject] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
-        }
-
-        if (!busProjectService.isAboveWork(Consts.PROJECT_NAME, api.getProjectID().longValue(), account.getUsername())) {
-            response.sendError(401, "需要work以上权限");
             return null;
         }
         api.setUpdateUsername(account.getUsername());
@@ -118,15 +105,6 @@ public class ApiController {
         if (httpApiBo.getBos().isEmpty()) {
             return Result.fail(CommonError.InvalidParamError);
         }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[ApiController.batchAddHttpApi] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
-        }
-
-        if (!busProjectService.isAboveWork(Consts.PROJECT_NAME, httpApiBo.getBos().get(0).getProjectID().longValue(), account.getUsername())) {
-            response.sendError(401, "需要work以上权限");
-            return null;
-        }
         httpApiBo.getBos().forEach(bo -> bo.setUpdateUserName(account.getUsername()));
         return httpApiService.batchAddHttpApi(httpApiBo.getApiEnv(), httpApiBo.getBos());
     }
@@ -153,18 +131,8 @@ public class ApiController {
             response.sendError(401, "未登录或者无权限");
             return null;
         }
-
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[ProjectController.addProject] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
-        }
-
-        if (!busProjectService.isAboveWork(Consts.PROJECT_NAME, api.getProjectID().longValue(), account.getUsername())) {
-            response.sendError(401, "需要work以上权限");
-            return null;
-        }
         api.setUpdateUsername(account.getUsername());
-        return httpApiService.editHttpApi(api, apiHeader, apiRequestParam, apiResultParam, apiErrorCodes,true);
+        return httpApiService.editHttpApi(api, apiHeader, apiRequestParam, apiResultParam, apiErrorCodes, true);
     }
 
     @ResponseBody
@@ -180,15 +148,6 @@ public class ApiController {
         if (null == account) {
             LOGGER.warn("[AccountController.editApiStatus] current user not have valid account info in session");
             response.sendError(401, "未登录或者无权限");
-            return null;
-        }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[ProjectController.editApiStatus] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
-        }
-
-        if (!busProjectService.isAboveWork(Consts.PROJECT_NAME, projectID.longValue(), account.getUsername())) {
-            response.sendError(401, "需要work以上权限");
             return null;
         }
         return apiService.editApiStatus(projectID, apiID, status);
@@ -213,10 +172,6 @@ public class ApiController {
             response.sendError(401, "未登录或者无权限");
             return null;
         }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[ProjectController.loadDubboApiServices] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
-        }
         if (namespace == null || namespace.equalsIgnoreCase("default")) {
             namespace = "";
         }
@@ -240,10 +195,6 @@ public class ApiController {
             LOGGER.warn("[AccountController.loadGrpcService] current user not have valid account info in session");
             response.sendError(401, "未登录或者无权限");
             return null;
-        }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[ProjectController.loadGrpcService] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
         }
         if (Objects.isNull(serviceName)) {
             serviceName = "";
@@ -270,10 +221,6 @@ public class ApiController {
             response.sendError(401, "未登录或者无权限");
             return null;
         }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[ProjectController.loadGrpcApiInfos] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
-        }
         return grpcApiService.loadGrpcApiInfos(appName);
     }
 
@@ -292,10 +239,6 @@ public class ApiController {
             LOGGER.warn("[AccountController.loadGrpcServerAddr] current user not have valid account info in session");
             response.sendError(401, "未登录或者无权限");
             return null;
-        }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[ProjectController.loadGrpcServerAddr] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
         }
         return grpcApiService.loadGrpcServerAddr(appName);
     }
@@ -319,15 +262,6 @@ public class ApiController {
             response.sendError(401, "未登录或者无权限");
             return null;
         }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[ApiController.batchAddGrpcApi] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
-        }
-
-        if (!busProjectService.isAboveWork(Consts.PROJECT_NAME, grpcApiBo.getProjectID().longValue(), account.getUsername())) {
-            response.sendError(401, "需要work以上权限");
-            return null;
-        }
         grpcApiBo.setUpdateUserName(account.getUsername());
         return grpcApiService.batchAddGrpcApi(grpcApiBo);
     }
@@ -349,15 +283,6 @@ public class ApiController {
         if (null == account) {
             LOGGER.warn("[ApiController.updateGrpcApi] current user not have valid account info in session");
             response.sendError(401, "未登录或者无权限");
-            return null;
-        }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[ApiController.updateGrpcApi] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
-        }
-
-        if (!busProjectService.isAboveWork(Consts.PROJECT_NAME, updateGrpcApiBo.getProjectId().longValue(), account.getUsername())) {
-            response.sendError(401, "需要work以上权限");
             return null;
         }
         updateGrpcApiBo.setUpdateUserName(account.getUsername());
@@ -384,11 +309,7 @@ public class ApiController {
             response.sendError(401, "未登录或者无权限");
             return null;
         }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[ProjectController.getGrpcApiDetail] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
-        }
-        return grpcApiService.getGrpcApiDetail(account.getId().intValue(), projectID, apiID);
+        return grpcApiService.getGrpcApiDetail(account.getUsername(), projectID, apiID);
     }
 
     /**
@@ -409,10 +330,6 @@ public class ApiController {
             LOGGER.warn("[AccountController.loadHttpApiInfos] current user not have valid account info in session");
             response.sendError(401, "未登录或者无权限");
             return null;
-        }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[ProjectController.loadHttpApiInfos] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
         }
         return httpApiService.getAllHttpModulesInfo(serviceName);
     }
@@ -436,10 +353,6 @@ public class ApiController {
             response.sendError(401, "未登录或者无权限");
             return null;
         }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[ProjectController.loadDubboApiInfos] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
-        }
         if (ip == null) {
             ip = "";
         }
@@ -455,7 +368,7 @@ public class ApiController {
     @ResponseBody
     @RequestMapping(value = "/editApiDiyExp", method = RequestMethod.POST)
     public Result<Boolean> editApiDiyExp(HttpServletRequest request,
-                                         HttpServletResponse response, Integer apiID, Integer expType, Integer type,String content) throws IOException, NacosException {
+                                         HttpServletResponse response, Integer apiID, Integer expType, Integer type, String content) throws IOException, NacosException {
         SessionAccount account = loginService.getAccountFromSession(request);
 
         if (null == account) {
@@ -463,11 +376,7 @@ public class ApiController {
             response.sendError(401, "未登录或者无权限");
             return null;
         }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[ApiController.editApiDiyExp] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
-        }
-        return apiService.editApiDiyExp(apiID,expType,type,content);
+        return apiService.editApiDiyExp(apiID, expType, type, content);
     }
 
     @ResponseBody
@@ -480,10 +389,6 @@ public class ApiController {
             LOGGER.warn("[AccountController.manualUpdateDubboApi] current user not have valid account info in session");
             response.sendError(401, "未登录或者无权限");
             return null;
-        }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[ProjectController.manualUpdateDubboApi] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
         }
         dto.setOpUsername(account.getUsername());
         return dubboApiService.manualUpdateDubboApi(dto);
@@ -500,10 +405,6 @@ public class ApiController {
             response.sendError(401, "未登录或者无权限");
             return null;
         }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[ProjectController.manualUpdateHttpApi] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
-        }
         dto.setOpUsername(account.getUsername());
         return httpApiService.manualUpdateHttpApi(dto);
     }
@@ -518,10 +419,6 @@ public class ApiController {
             LOGGER.warn("[AccountController.manualUpdateGatewayApi] current user not have valid account info in session");
             response.sendError(401, "未登录或者无权限");
             return null;
-        }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[ProjectController.manualUpdateGatewayApi] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
         }
         dto.setOpUsername(account.getUsername());
         return gatewayApiService.manualUpdateGatewayApi(dto);
@@ -546,11 +443,6 @@ public class ApiController {
             response.sendError(401, "未登录或者无权限");
             return null;
         }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[ProjectController.loadDubboApiInfos] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
-        }
-
         return gatewayApiService.loadGatewayApiInfoFromRemote(env, url);
     }
 
@@ -574,12 +466,8 @@ public class ApiController {
             response.sendError(401, "未登录或者无权限");
             return null;
         }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[ProjectController.getGatewayApiDetail] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
-        }
 
-        return gatewayApiService.getGatewayApiDetail(account.getId().intValue(), projectID, apiID);
+        return gatewayApiService.getGatewayApiDetail(account.getUsername(), projectID, apiID);
     }
 
     /**
@@ -606,15 +494,6 @@ public class ApiController {
         if (null == account) {
             LOGGER.warn("[AccountController.addGatewayApi] current user not have valid account info in session");
             response.sendError(401, "未登录或者无权限");
-            return null;
-        }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[ProjectController.editApiStatus] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
-        }
-
-        if (!busProjectService.isAboveWork(Consts.PROJECT_NAME, gatewayApiInfoBo.getProjectId().longValue(), account.getUsername())) {
-            response.sendError(401, "需要work以上权限");
             return null;
         }
         gatewayApiInfoBo.setUpdater(account.getUsername());
@@ -656,15 +535,6 @@ public class ApiController {
             response.sendError(401, "未登录或者无权限");
             return null;
         }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[ProjectController.batchAddGatewayApi] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
-        }
-
-        if (!busProjectService.isAboveWork(Consts.PROJECT_NAME, projectID.longValue(), account.getUsername())) {
-            response.sendError(401, "需要work以上权限");
-            return null;
-        }
         return gatewayApiService.batchAddGatewayApi(projectID, groupID, env, urlList, account.getUsername());
     }
 
@@ -692,18 +562,8 @@ public class ApiController {
             response.sendError(401, "未登录或者无权限");
             return null;
         }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[ApiController.editApiStatus] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
-        }
-
-        if (!busProjectService.isAboveWork(Consts.PROJECT_NAME, gatewayApiInfoBo.getProjectId().longValue(), account.getUsername())) {
-            response.sendError(401, "需要work以上权限");
-            return null;
-        }
         gatewayApiInfoBo.setUpdater(account.getUsername());
         return gatewayApiService.updateGatewayApi(gatewayApiInfoBo, apiHeader, apiRequestParam, apiResultParam, apiErrorCodes, apiID, Consts.GW_ALTER_TYPE_NORMAL);
-//        }
     }
 
     /**
@@ -723,15 +583,6 @@ public class ApiController {
         if (null == account) {
             LOGGER.warn("[ApiController.addDubboApi] current user not have valid account info in session");
             response.sendError(401, "未登录或者无权限");
-            return null;
-        }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[ApiController.editApiStatus] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
-        }
-
-        if (!busProjectService.isAboveWork(Consts.PROJECT_NAME, apiBo.getProjectId().longValue(), account.getUsername())) {
-            response.sendError(401, "需要work以上权限");
             return null;
         }
         apiBo.setUsername(account.getUsername());
@@ -757,16 +608,8 @@ public class ApiController {
             response.sendError(401, "未登录或者无权限");
             return null;
         }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[ApiController.batchAddDubboApi] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
-        }
         if (dubboApiBo.getBos().isEmpty()) {
             return Result.fail(CommonError.InvalidParamError);
-        }
-        if (!busProjectService.isAboveWork(Consts.PROJECT_NAME, dubboApiBo.getBos().get(0).getProjectID().longValue(), account.getUsername())) {
-            response.sendError(401, "需要work以上权限");
-            return null;
         }
         dubboApiBo.getBos().forEach(bo -> bo.setUpdateUserName(account.getUsername()));
         return dubboApiService.batchAddDubboApi(dubboApiBo.getApiEnv(), dubboApiBo.getBos());
@@ -792,18 +635,8 @@ public class ApiController {
             response.sendError(401, "未登录或者无权限");
             return null;
         }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[ProjectController.editApiStatus] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
-        }
-
-        if (!busProjectService.isAboveWork(Consts.PROJECT_NAME, apiBo.getProjectId().longValue(), account.getUsername())) {
-            response.sendError(401, "需要work以上权限");
-            return null;
-        }
         apiBo.setUsername(account.getUsername());
         return dubboApiService.updateDubboApi(apiBo, apiBo.getApiID());
-//        }
     }
 
     /**
@@ -826,11 +659,7 @@ public class ApiController {
             response.sendError(401, "未登录或者无权限");
             return null;
         }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[ProjectController.getDubboApiDetail] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
-        }
-        return dubboApiService.getDubboApiDetail(account.getId().intValue(), projectID, apiID);
+        return dubboApiService.getDubboApiDetail(account.getUsername(), projectID, apiID);
     }
 
     /**
@@ -861,38 +690,6 @@ public class ApiController {
         return dubboApiService.getDubboApiDetailFromRemote(env, dubboApiRequestBo);
     }
 
-
-    /**
-     * 批量删除api,将其移入回收站
-     *
-     * @param request
-     * @return
-     */
-    @ResponseBody
-    @RequestMapping(value = "/removeApi", method = RequestMethod.POST)
-    public Result<Boolean> removeApi(HttpServletRequest request,
-                                     HttpServletResponse response,
-                                     String apiIDs, Integer projectID) throws IOException {
-        SessionAccount account = loginService.getAccountFromSession(request);
-
-        if (null == account) {
-            LOGGER.warn("[AccountController.removeApi] current user not have valid account info in session");
-            response.sendError(401, "未登录或者无权限");
-            return null;
-        }
-        if (!busProjectService.isBusProjectAdmin(Consts.PROJECT_NAME, projectID.longValue(), account.getUsername())) {
-            response.sendError(401, "需要admin权限执行此操作");
-            return null;
-        }
-
-        boolean result = apiService.removeApi(projectID, apiIDs, account.getId().intValue(), account.getUsername());
-        if (result) {
-            return Result.success(true);
-        } else {
-            return Result.fail(CommonError.UnknownError);
-        }
-    }
-
     /**
      * 彻底删除接口
      *
@@ -909,10 +706,6 @@ public class ApiController {
         if (null == account) {
             LOGGER.warn("[AccountController.deleteApi] current user not have valid account info in session");
             response.sendError(401, "未登录或者无权限");
-            return null;
-        }
-        if (!busProjectService.isBusProjectAdmin(Consts.PROJECT_NAME, projectID.longValue(), account.getUsername())) {
-            response.sendError(401, "需要admin权限执行此操作");
             return null;
         }
         boolean result = apiService.deleteApi(projectID, apiIDs, account.getUsername());
@@ -943,17 +736,7 @@ public class ApiController {
             response.sendError(401, "未登录或者无权限");
             return null;
         }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[ProjectController.editApiStatus] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
-        }
-
-        if (!busProjectService.isMember(Consts.PROJECT_NAME, projectID.longValue(), account.getUsername())) {
-            response.sendError(401, "不是项目成员");
-            return null;
-        }
-
-        Map<String, Object> result = httpApiService.getHttpApi(account.getId().intValue(), projectID, apiID);
+        Map<String, Object> result = httpApiService.getHttpApi(account.getUsername(), projectID, apiID);
         return Result.success(result);
     }
 
@@ -977,10 +760,6 @@ public class ApiController {
         if (null == account) {
             LOGGER.warn("[AccountController.getApiList] current user not have valid account info in session");
             response.sendError(401, "未登录或者无权限");
-            return null;
-        }
-        if (!busProjectService.isMember(Consts.PROJECT_NAME, projectID.longValue(), account.getUsername())) {
-            response.sendError(401, "不是项目成员");
             return null;
         }
         Map<String, Object> result = apiService.getApiList(pageNo, pageSize, projectID, groupID, orderBy, asc);
@@ -1007,10 +786,6 @@ public class ApiController {
             response.sendError(401, "未登录或者无权限");
             return null;
         }
-        if (!busProjectService.isMember(Consts.PROJECT_NAME, projectID.longValue(), account.getUsername())) {
-            response.sendError(401, "不是项目成员");
-            return null;
-        }
         Map<Integer, List<Map<String, Object>>> result = apiService.getGroupApiViewList(projectID);
         return Result.success(result);
     }
@@ -1026,7 +801,7 @@ public class ApiController {
             response.sendError(401, "未登录或者无权限");
             return null;
         }
-        List<Api> result = apiService.getRecentlyApiList(account.getId().intValue());
+        List<Api> result = apiService.getRecentlyApiList(account.getUsername());
         return Result.success(result);
     }
 
@@ -1050,10 +825,6 @@ public class ApiController {
             return null;
         }
 
-        if (!busProjectService.isMember(Consts.PROJECT_NAME, projectID.longValue(), account.getUsername())) {
-            response.sendError(401, "不是项目成员");
-            return null;
-        }
         return apiService.getApiListByIndex(indexID);
     }
 
@@ -1074,10 +845,6 @@ public class ApiController {
         if (null == account) {
             LOGGER.warn("[AccountController.getAllIndexGroupApiViewList] current user not have valid account info in session");
             response.sendError(401, "未登录或者无权限");
-            return null;
-        }
-        if (!busProjectService.isMember(Consts.PROJECT_NAME, projectID.longValue(), account.getUsername())) {
-            response.sendError(401, "不是项目成员");
             return null;
         }
         Map<Integer, List<Map<String, Object>>> result = apiService.getAllIndexGroupApiViewList(projectID);
@@ -1103,10 +870,6 @@ public class ApiController {
             response.sendError(401, "未登录或者无权限");
             return null;
         }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[ProjectController.editApiStatus] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
-        }
 
         List<Map<String, Object>> result = apiService.searchApi(projectID, tips, type);
         return Result.success(result);
@@ -1122,14 +885,6 @@ public class ApiController {
         if (null == account) {
             LOGGER.warn("[AccountController.editApiMockExpect] current user not have valid account info in session");
             response.sendError(401, "未登录或者无权限");
-            return null;
-        }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[ProjectController.editApiMockExpect] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
-        }
-        if (!busProjectService.isMember(Consts.PROJECT_NAME, bo.getProjectID().longValue(), account.getUsername())) {
-            response.sendError(401, "不是该项目成员");
             return null;
         }
         switch (bo.getApiType()) {

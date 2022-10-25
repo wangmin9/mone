@@ -3,10 +3,10 @@ package com.xiaomi.miapi.service;
 import com.xiaomi.miapi.common.bo.ApiEnvBo;
 import com.xiaomi.miapi.common.bo.ProjectGroupBo;
 import com.xiaomi.miapi.common.pojo.ApiEnv;
+import com.xiaomi.miapi.common.pojo.BusProjectGroup;
 import com.xiaomi.miapi.common.pojo.Project;
 import com.xiaomi.miapi.common.Result;
 import com.xiaomi.miapi.vo.BusProjectVo;
-import com.xiaomi.youpin.hermes.entity.ProjectGroup;
 
 import java.util.List;
 import java.util.Map;
@@ -18,66 +18,61 @@ public interface ProjectService
 {
 
 	// 新增项目
-	public Result<Boolean> addProject(Project project, Integer userID, String username);
+	Result<Boolean> addProject(Project project, String username);
 
-	public boolean focusProject(Integer projectId,Integer accountId);
+	boolean focusProject(Integer projectId,String username);
 
-	public Result<Boolean> unFocusProject(Integer projectId,Integer accountId);
+	Result<Boolean> unFocusProject(Integer projectId,String username);
 
-	public List<BusProjectVo> getFocusProject(Integer accountId);
+	List<BusProjectVo> getFocusProject(String username);
 
 	// 删除项目
-	public boolean deleteProject(Integer projectID,Integer userId,String username);
+	boolean deleteProject(Integer projectID,String username);
 
 	// 获取项目列表
-	public Result<List<BusProjectVo>> getProjectList(Integer userId);
+	Result<List<BusProjectVo>> getProjectList(String username);
 
-	public Result<Map<String,List<Map<String,Object>>>> indexSearch(String keyword);
+	Result<Map<String,List<Map<String,Object>>>> indexSearch(String keyword);
 
-	public Result<List<BusProjectVo>> getProjectListByProjectGroupId(Integer projectGroupID,Integer userId,String username);
+	Result<List<BusProjectVo>> getProjectListByProjectGroupId(Integer projectGroupID,String username);
 
 	// 修改项目
-	public boolean editProject(Project project,String username);
+	boolean editProject(Project project,String username);
 
 	//获取项目详情
-	public Result<Map<String, Object>> getProject(Integer projectID,Integer userId);
+	Result<Map<String, Object>> getProject(Integer projectID,String username);
 
-	public List<BusProjectVo> getRecentlyProjectList(Integer userId);
+	List<BusProjectVo> getRecentlyProjectList(String username);
 
-	public Result<Map<String,Object>> getMyProjects(Integer userId);
+	Result<Map<String,Object>> getMyProjects(String username);
 	//获取项目日志列表
-	public List<Map<String, Object>> getProjectLogList(Integer projectID, Integer page, Integer pageSize);
+	List<Map<String, Object>> getProjectLogList(Integer projectID, Integer page, Integer pageSize);
 
 	//获取项目日志条数
-	public int getProjectLogCount(Integer projectID, int dayOffset);
+	int getProjectLogCount(Integer projectID, int dayOffset);
 
 	//获取接口数量
-	public int getApiNum(Integer projectID);
+	int getApiNum(Integer projectID);
 
 	//===========项目组相关==========
-	Result<Boolean> createProjectGroup(ProjectGroupBo projectGroupBo,int userId);
+	Result<Boolean> createProjectGroup(ProjectGroupBo projectGroupBo,String username);
 
 	Result<Boolean> updateProjectGroup(ProjectGroupBo projectGroupBo);
 
-	List<ProjectGroup> getAllProjectGroup();
+	List<BusProjectGroup> getAllProjectGroup();
 
-	List<ProjectGroup> getAllAccessableProjectGroup(int accountId);
-
-	Result<ProjectGroup> getProjectGroupById(Integer id);
+	Result<BusProjectGroup> getProjectGroupById(Integer id);
 
 	Result<Boolean> deleteProjectGroup(Integer projectGroupId, String userName);
 
-	public Result<Boolean> addApiEnv(ApiEnvBo bo, String opUsername);
+	Result<Boolean> addApiEnv(ApiEnvBo bo, String opUsername);
 
-	public Result<Boolean> editApiEnv(ApiEnvBo bo,String opUsername);
+	Result<Boolean> editApiEnv(ApiEnvBo bo,String opUsername);
 
-	public Result<Boolean> deleteApiEnv(Integer envID,String opUsername);
+	Result<Boolean> deleteApiEnv(Integer envID,String opUsername);
 
-	public Result<ApiEnv> getApiEnv(Integer envID);
+	Result<ApiEnv> getApiEnv(Integer envID);
 
-	public Result<List<ApiEnv>> getApiEnvList(Integer projectID);
-
-
-//	public Result<Boolean> importMioneProject(Project project, Integer userID,String username);
+	Result<List<ApiEnv>> getApiEnvList(Integer projectID);
 
 }

@@ -9,7 +9,7 @@ public class ApiGroup
 	private String groupName;//分组名称
 	private Integer projectID;//项目ID
 	private String groupDesc;
-	private Integer userID;
+	private String username;
 	private Boolean systemGroup;
 
 
@@ -59,13 +59,11 @@ public class ApiGroup
 		this.projectID = projectID;
 	}
 
-	public Integer getUserID()
-	{
-		return userID;
+	public String getUsername() {
+		return username;
 	}
 
-	public void setUserID(Integer userID)
-	{
-		this.userID = userID;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 }

@@ -24,7 +24,7 @@ public interface DubboApiService {
 
     public Result<Boolean> manualUpdateDubboApi(ManualDubboUpDTO dto) throws NacosException;
 
-    public Result<Map<String, Object>> getDubboApiDetail(Integer userId,Integer projectID, Integer apiID);
+    public Result<Map<String, Object>> getDubboApiDetail(String username,Integer projectID, Integer apiID);
 
     public Map<String, Object> getBasicDubboApiDetail(Integer projectID, Integer apiID);
 

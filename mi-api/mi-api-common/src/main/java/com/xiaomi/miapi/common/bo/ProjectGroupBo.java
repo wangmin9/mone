@@ -8,4 +8,5 @@ public class ProjectGroupBo {
     private String groupName;
     private String groupDesc;
     private boolean pubGroup;
+    private String username;
 }

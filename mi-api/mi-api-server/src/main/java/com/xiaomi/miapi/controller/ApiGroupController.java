@@ -4,11 +4,8 @@ import com.xiaomi.miapi.util.SessionAccount;
 import com.xiaomi.miapi.common.pojo.ApiGroup;
 import com.xiaomi.miapi.service.ApiGroupService;
 import com.xiaomi.miapi.service.impl.LoginService;
-import com.xiaomi.miapi.common.Consts;
 import com.xiaomi.miapi.common.Result;
 import com.xiaomi.miapi.common.exception.CommonError;
-import com.xiaomi.youpin.hermes.service.BusProjectService;
-import org.apache.dubbo.config.annotation.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +31,6 @@ public class ApiGroupController {
 
     @Resource
     ApiGroupService apiGroupService;
-
-    @Reference(check = false,group = "${ref.hermes.service.group}")
-    private BusProjectService busProjectService;
 
     @Autowired
     private LoginService loginService;
@@ -64,22 +58,8 @@ public class ApiGroupController {
                 response.sendError(401, "未登录或者无权限");
                 return null;
             }
-            if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-                LOGGER.warn("[ProjectController.addProject] not authorized to create project");
-                return Result.fail(CommonError.UnAuthorized);
-            }
-
-            if (!busProjectService.isBusProjectAdmin(Consts.PROJECT_NAME, apiGroup.getProjectID().longValue(), account.getUsername())) {
-                response.sendError(401, "不是该项目成员");
-                return null;
-            }
-            apiGroup.setUserID(account.getId().intValue());
-            boolean result = apiGroupService.addApiGroup(apiGroup,account.getUsername());
-            if (result) {
-                return Result.success(true);
-            } else {
-                return Result.fail(CommonError.UnknownError);
-            }
+            apiGroup.setUsername(account.getUsername());
+            return apiGroupService.addApiGroup(apiGroup,account.getUsername());
         }
     }
 
@@ -106,17 +86,7 @@ public class ApiGroupController {
                 return null;
             }
 
-            if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-                LOGGER.warn("[ProjectController.deleteGroup] not authorized to create project");
-                return Result.fail(CommonError.UnAuthorized);
-            }
-
-            if (!busProjectService.isBusProjectAdmin(Consts.PROJECT_NAME, projectID.longValue(), account.getUsername())) {
-                response.sendError(401, "不是该项目成员");
-                return null;
-            }
-
-            return apiGroupService.deleteGroup(projectID, groupID, account.getId().intValue(), account.getUsername());
+            return apiGroupService.deleteGroup(projectID, groupID, account.getUsername());
         }
     }
 
@@ -144,15 +114,6 @@ public class ApiGroupController {
                 return null;
             }
 
-            if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-                LOGGER.warn("[ProjectController.getGroupList] not authorized to create project");
-                return Result.fail(CommonError.UnAuthorized);
-            }
-
-            if (!busProjectService.isMember(Consts.PROJECT_NAME, projectID.longValue(), account.getUsername())) {
-                response.sendError(401, "不是该项目成员");
-                return null;
-            }
             List<Map<String, Object>> result = apiGroupService.getGroupList(projectID);
             map.put("groupList", result);
             return Result.success(map);
@@ -180,17 +141,8 @@ public class ApiGroupController {
                 response.sendError(401, "未登录或者无权限");
                 return null;
             }
-            if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-                LOGGER.warn("[ProjectController.editGroup] not authorized to create project");
-                return Result.fail(CommonError.UnAuthorized);
-            }
-
-            if (!busProjectService.isBusProjectAdmin(Consts.PROJECT_NAME, apiGroup.getProjectID().longValue(), account.getUsername())) {
-                response.sendError(401, "需要该项目admin权限执行此操作");
-                return null;
-            }
-            apiGroup.setUserID(account.getId().intValue());
-            boolean result = apiGroupService.editGroup(apiGroup,account.getUsername());
+            apiGroup.setUsername(account.getUsername());
+            boolean result = apiGroupService.editGroup(apiGroup);
             if (result) {
                 return Result.success(true);
             } else {

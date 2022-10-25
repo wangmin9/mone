@@ -17,9 +17,6 @@ import com.xiaomi.miapi.common.Result;
 import com.xiaomi.data.push.nacos.NacosNaming;
 import com.xiaomi.miapi.service.ApiTestService;
 import com.xiaomi.miapi.common.exception.CommonError;
-import com.xiaomi.youpin.hermes.bo.response.BusProjectRoleResp;
-import com.xiaomi.youpin.hermes.entity.BusProject;
-import com.xiaomi.youpin.hermes.service.BusProjectService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.Charsets;
 import org.apache.commons.lang3.StringUtils;
@@ -74,9 +71,6 @@ public class ApiTestServiceImpl implements ApiTestService {
     @Autowired
     RedisUtil redisUtil;
 
-    @DubboReference(check = false, group = "${ref.hermes.service.group}")
-    private BusProjectService busProjectService;
-
     @Resource(name = "stRegistry")
     private RegistryConfig stRegistryConfig;
 
@@ -88,6 +82,12 @@ public class ApiTestServiceImpl implements ApiTestService {
 
     @Resource(name = "nacosNamingOl")
     private NacosNaming nacosNamingOl;
+
+    @Autowired
+    private BusProjectGroupMapper busProjectGroupMapper;
+
+    @Autowired
+    private BusProjectMapper busProjectMapper;
 
     private final GrpcReflectionCall grpcCall = new GrpcReflectionCall();
 
@@ -175,34 +175,7 @@ public class ApiTestServiceImpl implements ApiTestService {
     }
 
     @Override
-    public Result<Boolean> applyOnlineDubboTest(DubboTestPermissionApplyDTO dto) {
-        Map<String,String> info = new HashMap<>();
-        info.put("serviceName", dto.getServiceName());
-        info.put("groupName",dto.getGroup());
-        info.put("versionName",dto.getVersion());
-        info.put("operator",dto.getOperator());
-        String rKey = String.join(":",dto.getServiceName(),dto.getGroup(),dto.getVersion(),dto.getOperator(),Integer.toString(dto.getUserId()));
-
-        info.put("rKey",rKey);
-        String content = TemplateUtils.processTemplate(Consts.reviewTmp,info);
-
-        List<BusProjectRoleResp> members = busProjectService.members(dto.getProjectId());
-        members.forEach(member ->{
-            if (0 == member.getRoleType()){
-                feiShuService.sendCard2Person(member.getEUsername(),content);
-            }
-        });
-        return Result.success(true);
-    }
-
-    @Override
-    public Result<Object> dubboTest(DubboTestBo request, String opUsername,Integer userId) throws NacosException {
-        if (request.isProduction()){
-            String rKey = String.join(":",request.getInterfaceName(),request.getGroup(),request.getVersion(),opUsername,Integer.toString(userId));
-            if (!checkUserTestPermission(rKey)){
-                return Result.fail(CommonError.ApplyPermissionPlease);
-            }
-        }
+    public Result<Object> dubboTest(DubboTestBo request, String opUsername) {
         Map<String, Object> resultMap = new HashMap<>();
         log.info("excecuteDubbo:{}", new Gson().toJson(request));
 
@@ -252,7 +225,7 @@ public class ApiTestServiceImpl implements ApiTestService {
         if (StringUtils.isEmpty(request.getParameter())) {
             methodInfo.setArgs(new Object[]{});
         } else {
-            Object[] params = new Object[0];
+            Object[] params;
             try {
                 params = new Gson().fromJson(request.getParameter(), new TypeToken<Object[]>() {
                 }.getType());
@@ -298,22 +271,8 @@ public class ApiTestServiceImpl implements ApiTestService {
         return redisUtil.exists(rKey);
     }
 
-    private boolean checkRightEnv(boolean online,String providerName) throws NacosException {
-        if (providerName.contains("::")){
-            providerName = providerName.replaceFirst("::",":");
-        }
-        List<Instance> instanceList;
-        if (!online){
-            instanceList = nacosNamingSt.getAllInstances(providerName);
-        }else {
-            log.warn("select provider name:{}",providerName);
-            instanceList = nacosNamingOl.getAllInstances(providerName);
-        }
-        return instanceList != null && !instanceList.isEmpty();
-    }
-
     @Override
-    public Object grpcTest(GrpcTestBo request, String opUsername) throws Exception {
+    public Object grpcTest(GrpcTestBo request, String opUsername) {
         String[] addrs = request.getAddrs().split(",");
         String tmpAddr = addrs[new Random().nextInt(addrs.length)];
         final String serviceName = StringUtils.join(new String[]{request.getPackageName(), request.getInterfaceName()}, ".");
@@ -336,7 +295,7 @@ public class ApiTestServiceImpl implements ApiTestService {
 
     @Override
     public Result<Boolean> createTestCaseDir(TestCaseDirDTO testCaseDir) {
-        BusProject busProject = busProjectService.queryBusProjectById(testCaseDir.getProjectId());
+        BusProject busProject = busProjectMapper.selectByPrimaryKey(testCaseDir.getProjectId());
         if (busProject == null) {
             Result.fail(CommonError.ProjectDoNotExist);
         }
@@ -347,7 +306,7 @@ public class ApiTestServiceImpl implements ApiTestService {
         } else {
             caseGroup.setApiId(testCaseDir.getApiId());
         }
-        caseGroup.setAccountId(testCaseDir.getAccountId());
+        caseGroup.setAccountId(0);
         caseGroup.setProjectId(testCaseDir.getProjectId());
         testCaseGroupMapper.insert(caseGroup);
         return Result.success(true);
@@ -384,7 +343,7 @@ public class ApiTestServiceImpl implements ApiTestService {
         } else {
             testCase.setApiId(0);
         }
-        testCase.setAccountId(caseBo.getAccountId());
+        testCase.setAccountId(0);
         testCase.setCaseName(caseBo.getCaseName());
         testCase.setCaseGroupId(caseBo.getCaseGroupId());
         testCase.setApiProtocal(Consts.HTTP_API_TYPE);
@@ -453,7 +412,7 @@ public class ApiTestServiceImpl implements ApiTestService {
             testCase.setApiId(0);
         }
         testCase.setUrl(caseBo.getUrl());
-        testCase.setAccountId(caseBo.getAccountId());
+        testCase.setAccountId(0);
         testCase.setCaseName(caseBo.getCaseName());
         testCase.setCaseGroupId(caseBo.getCaseGroupId());
         testCase.setApiProtocal(Consts.GATEWAY_API_TYPE);
@@ -514,7 +473,7 @@ public class ApiTestServiceImpl implements ApiTestService {
         } else {
             testCase.setApiId(0);
         }
-        testCase.setAccountId(caseBo.getAccountId());
+        testCase.setAccountId(0);
         testCase.setCaseName(caseBo.getCaseName());
         testCase.setCaseGroupId(caseBo.getCaseGroupId());
         testCase.setApiProtocal(Consts.DUBBO_API_TYPE);
@@ -576,7 +535,7 @@ public class ApiTestServiceImpl implements ApiTestService {
             }
         }
         //common
-        testCase.setAccountId(caseBo.getAccountId());
+        testCase.setAccountId(0);
         testCase.setRequestTimeout(caseBo.getRequestTimeout());
         testCase.setDubboRetryTime(caseBo.getRetry());
 
@@ -607,7 +566,7 @@ public class ApiTestServiceImpl implements ApiTestService {
         } else {
             testCase.setApiId(0);
         }
-        testCase.setAccountId(caseBo.getAccountId());
+        testCase.setAccountId(0);
         testCase.setCaseName(caseBo.getCaseName());
         testCase.setCaseGroupId(caseBo.getCaseGroupId());
         testCase.setApiProtocal(Consts.GRPC_API_TYPE);
@@ -643,7 +602,7 @@ public class ApiTestServiceImpl implements ApiTestService {
             testCase.setGrpcInterfaceName(caseBo.getInterfaceName());
             testCase.setGrpcMethodName(caseBo.getMethodName());
         }
-        testCase.setAccountId(caseBo.getAccountId());
+        testCase.setAccountId(0);
         testCase.setRequestTimeout(caseBo.getRequestTimeout());
 
         if (StringUtils.isNotEmpty(caseBo.getGrpcAddr())) {
@@ -707,7 +666,7 @@ public class ApiTestServiceImpl implements ApiTestService {
 
 
     @Override
-    public Result<List<CaseGroupAndCasesBo>> getCasesByApi(int projectId, int apiId, int accountId) {
+    public Result<List<CaseGroupAndCasesBo>> getCasesByApi(int projectId, int apiId) {
         List<CaseGroupAndCasesBo> groupAndCasesBos = new ArrayList<>();
         Api api = apiMapper.getApiInfo(projectId, apiId);
         if (Objects.isNull(api)) {
@@ -731,9 +690,9 @@ public class ApiTestServiceImpl implements ApiTestService {
     }
 
     @Override
-    public Result<List<CaseGroupAndCasesBo>> getCasesByProject(int projectId, int accountId) {
+    public Result<List<CaseGroupAndCasesBo>> getCasesByProject(int projectId) {
         List<CaseGroupAndCasesBo> groupAndCasesBos = new ArrayList<>();
-        BusProject project = busProjectService.queryBusProjectById(projectId);
+        BusProject project = busProjectMapper.selectByPrimaryKey(projectId);
         if (Objects.isNull(project)) {
             return Result.fail(CommonError.ProjectDoNotExist);
         }

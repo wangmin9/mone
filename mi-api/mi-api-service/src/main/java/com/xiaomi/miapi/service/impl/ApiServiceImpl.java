@@ -7,7 +7,6 @@ import com.xiaomi.miapi.common.bo.NacosInfo;
 import com.xiaomi.miapi.common.dto.ProjectApisDTO;
 import com.xiaomi.miapi.common.pojo.*;
 import com.xiaomi.miapi.mapper.*;
-import com.xiaomi.miapi.util.HttpUtils;
 import com.xiaomi.miapi.util.RedisUtil;
 import com.xiaomi.miapi.common.Consts;
 import com.xiaomi.miapi.common.Result;
@@ -21,10 +20,7 @@ import com.xiaomi.miapi.common.exception.CommonError;
 import com.xiaomi.youpin.codegen.HttpRequestGen;
 import com.xiaomi.youpin.codegen.bo.ApiHeaderBo;
 import com.xiaomi.youpin.codegen.bo.HttpJsonParamsBo;
-import com.xiaomi.youpin.hermes.service.BusProjectService;
 import org.apache.dubbo.common.utils.StringUtils;
-import org.apache.dubbo.config.annotation.DubboReference;
-import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,9 +86,6 @@ public class ApiServiceImpl implements ApiService {
 
     @Autowired
     NacosInfo nacosInfo;
-
-    @DubboReference(check = false, group = "${ref.hermes.service.group}")
-    private BusProjectService busProjectService;
 
     @Resource(name = "nacosNamingSt")
     private NacosNaming nacosNamingSt;
@@ -204,34 +197,6 @@ public class ApiServiceImpl implements ApiService {
     }
 
     /**
-     * 移除接口到回收站
-     */
-    @Override
-    public boolean removeApi(Integer projectID, String apiID, Integer userID, String username) {
-        Integer result = 0;
-        Date date = new Date();
-        Timestamp updateTime = new Timestamp(date.getTime());
-        JSONArray jsonArray = JSONArray.parseArray(apiID);
-        List<Integer> apiIDs = new ArrayList<Integer>();
-        if (jsonArray != null && !jsonArray.isEmpty()) {
-            for (Iterator<Object> iterator = jsonArray.iterator(); iterator.hasNext(); ) {
-                apiIDs.add((Integer) iterator.next());
-            }
-            result = apiMapper.removeApi(projectID, apiIDs, updateTime);
-        }
-        if (result > 0) {
-            String apiName = apiMapper.getApiNameByIDs(apiIDs);
-            Api api = new Api();
-            api.setProjectID(projectID);
-            api.setApiUpdateTime(updateTime);
-            api.setUpdateUsername(username);
-            recordService.doRecord(api, null, "将接口:'" + apiName + "'移入接口回收站", "将接口:'" + apiName + "'移入接口回收站", ProjectOperationLog.OP_TYPE_DELETE);
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * 删除接口
      */
     @Override
@@ -248,7 +213,6 @@ public class ApiServiceImpl implements ApiService {
             }
             apiName = apiMapper.getApiNameByIDs(apiIDs);
             apis = apiMapper.getApiListByIDs(apiIDs);
-
             result = apiMapper.deleteApi(projectID, apiIDs);
         }
 
@@ -445,9 +409,9 @@ public class ApiServiceImpl implements ApiService {
         return Result.success(result);
     }
 
-    public List<Api> getRecentlyApiList(Integer userId) {
+    public List<Api> getRecentlyApiList(String username) {
         List<Api> apiList = new ArrayList<>();
-        List<String> apiIdsStr = redis.lRange(Consts.genRecentlyApisKey(userId), 0, 8);
+        List<String> apiIdsStr = redis.lRange(Consts.genRecentlyApisKey(username), 0, 8);
         if (apiIdsStr == null || apiIdsStr.size() == 0) {
             return apiList;
         }
@@ -539,11 +503,6 @@ public class ApiServiceImpl implements ApiService {
         historyRecord.setIsNow(true);
         if (historyRecordMapper.insert(historyRecord) <= 0) {
             LOGGER.warn("historyRecordMapper.insert history error,apiMsg:{}", historyRecord.getApiHistiryJson());
-        }
-        //通知测试团队
-        if (!updateMsg.equals(Consts.IMPORT_SWAGGER_FLAG)) {
-            ApiHistoryRecord finalOld = old;
-            new Thread(() -> notifyTestTeam(historyRecord, finalOld)).start();
         }
     }
 
@@ -716,32 +675,6 @@ public class ApiServiceImpl implements ApiService {
                 //不存在，插入
                 responseExpMapper.insert(responseExp);
             }
-        }
-    }
-
-
-    /**
-     * 通知测试团队接口变更
-     *
-     * @param currentRecord 当前最新的接口信息
-     * @param oldRecord     上一版接口信息
-     */
-    public void notifyTestTeam(ApiHistoryRecord currentRecord, ApiHistoryRecord oldRecord) {
-        Map<String, String> body = new HashMap<>();
-        compareApiAlterType(currentRecord, oldRecord, body);
-        Map<String, String> header = new HashMap<>();
-
-        body.put("projectName", busProjectService.queryBusProjectById(currentRecord.getProjectId()).getName());
-        body.put("groupName", apiGroupMapper.getGroupByID(currentRecord.getGroupId()).getGroupName());
-        body.put("currentRecord", gson.toJson(currentRecord));
-        body.put("oldRecord", gson.toJson(oldRecord));
-        header.put("Content-Type", "application/json;charset=UTF-8");
-        try {
-            if (body.get("isLogicUpdate").equals("0")) {
-                String TEST_GROUP_NOTIFY_URL = "https://127.0.0.1/paris/openapi/apirecord";
-                HttpUtils.post(TEST_GROUP_NOTIFY_URL, header, gson.toJson(body), 30000);
-            }
-        } catch (Exception ignored) {
         }
     }
 

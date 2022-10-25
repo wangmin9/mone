@@ -232,7 +232,7 @@ public class GrpcApiServiceImpl implements GrpcApiService {
     }
 
     @Override
-    public Result<Map<String, Object>> getGrpcApiDetail(int accountID, int projectID, int apiID) {
+    public Result<Map<String, Object>> getGrpcApiDetail(String username, int projectID, int apiID) {
         Map<String, Object> map = new HashMap<>();
         Api api = apiMapper.getApiInfo(projectID, apiID);
         if (null == api) {
@@ -270,7 +270,7 @@ public class GrpcApiServiceImpl implements GrpcApiService {
             map.put("appName",apiJson.get("appName"));
             map.put("errorCodes", apiJson.get("errorCodes"));
         }
-        redis.recordRecently10Apis(accountID, apiID);
+        redis.recordRecently10Apis(username, apiID);
         return Result.success(map);
     }
 

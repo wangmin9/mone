@@ -14,7 +14,7 @@ public class Document
 	private String content;// Markdown内容
 	private String title;// 文档标题
 	private Timestamp updateTime;// 更新时间
-	private Integer userID;// 更新人员ID
+	private String upUsername;// 更新人员ID
 	private Integer topParentGroupID;//一级父分组ID
 	private String createUserName; //创建者
 
@@ -96,14 +96,12 @@ public class Document
 		this.updateTime = updateTime;
 	}
 
-	public Integer getUserID()
-	{
-		return userID;
+	public String getUpUsername() {
+		return upUsername;
 	}
 
-	public void setUserID(Integer userID)
-	{
-		this.userID = userID;
+	public void setUpUsername(String upUsername) {
+		this.upUsername = upUsername;
 	}
 
 	public Integer getTopParentGroupID()

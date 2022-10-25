@@ -1,7 +1,6 @@
 package com.xiaomi.miapi.mapper;
 
-import com.xiaomi.miapi.common.pojo.ProjectFocus;
-import com.xiaomi.miapi.common.pojo.ProjectFocusExample;
+import com.xiaomi.miapi.common.pojo.*;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

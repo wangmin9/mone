@@ -4,12 +4,8 @@ import com.xiaomi.miapi.util.SessionAccount;
 import com.xiaomi.miapi.common.pojo.ApiHistoryRecord;
 import com.xiaomi.miapi.service.ApiHistoryService;
 import com.xiaomi.miapi.service.impl.LoginService;
-import com.xiaomi.miapi.common.Consts;
 import com.xiaomi.miapi.common.Result;
-import com.xiaomi.miapi.common.exception.CommonError;
-import com.xiaomi.youpin.hermes.service.BusProjectService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.config.annotation.Reference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,8 +24,6 @@ import java.util.Map;
 @RequestMapping("/ApiHistory")
 @Slf4j
 public class ApiHistoryController {
-    @Reference(check = false, group = "${ref.hermes.service.group}")
-    private BusProjectService busProjectService;
 
     @Autowired
     private LoginService loginService;
@@ -56,10 +50,6 @@ public class ApiHistoryController {
             response.sendError(401, "未登录或者无权限");
             return null;
         }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            log.warn("[ApiHistoryController.getHistoryRecordList] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
-        }
 
         return apiHistoryService.getApiHistoryList(apiID,pageNo,pageSize);
     }
@@ -82,10 +72,6 @@ public class ApiHistoryController {
             response.sendError(401, "未登录或者无权限");
             return null;
         }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            log.warn("[ApiHistoryController.rollbackToHis] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
-        }
 
         return apiHistoryService.rollbackToHis(apiID,targetHisID);
     }
@@ -107,10 +93,6 @@ public class ApiHistoryController {
             log.warn("[ApiHistoryController.getHistoryRecordById] current user not have valid account info in session");
             response.sendError(401, "未登录或者无权限");
             return null;
-        }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            log.warn("[ApiHistoryController.getHistoryRecordById] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
         }
         return apiHistoryService.getHistoryRecordById(recordID);
     }

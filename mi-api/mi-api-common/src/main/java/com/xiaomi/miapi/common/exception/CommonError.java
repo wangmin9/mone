@@ -23,7 +23,7 @@ package com.xiaomi.miapi.common.exception;
 public enum CommonError {
 
     Success(0, "success"),
-    UnknownError(1, "unknown error"),
+    UnknownError(1, "服务器内部错误"),
 
     // 参数问题
     InvalidParamError(100001, "无效的参数"),

@@ -3,12 +3,24 @@ package com.xiaomi.miapi.common.pojo;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class ProjectFocus {
+public class BusProject {
     private Integer id;
 
-    private Integer busprojectid;
+    private String name;
 
-    private String username;
+    private String description;
+
+    private Long ctime;
+
+    private Long utime;
+
+    private Integer status;
+
+    private Integer version;
+
+    private Integer busGroupId;
+
+    private Boolean isPublic;
 
     public Integer getId() {
         return id;
@@ -18,26 +30,80 @@ public class ProjectFocus {
         this.id = id;
     }
 
-    public Integer getBusprojectid() {
-        return busprojectid;
+    public String getName() {
+        return name;
     }
 
-    public void setBusprojectid(Integer busprojectid) {
-        this.busprojectid = busprojectid;
+    public void setName(String name) {
+        this.name = name == null ? null : name.trim();
     }
 
-    public String getUsername() {
-        return username;
+    public String getDescription() {
+        return description;
     }
 
-    public void setUsername(String username) {
-        this.username = username == null ? null : username.trim();
+    public void setDescription(String description) {
+        this.description = description == null ? null : description.trim();
+    }
+
+    public Long getCtime() {
+        return ctime;
+    }
+
+    public void setCtime(Long ctime) {
+        this.ctime = ctime;
+    }
+
+    public Long getUtime() {
+        return utime;
+    }
+
+    public void setUtime(Long utime) {
+        this.utime = utime;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public Integer getVersion() {
+        return version;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
+    }
+
+    public Integer getBusGroupId() {
+        return busGroupId;
+    }
+
+    public void setBusGroupId(Integer busGroupId) {
+        this.busGroupId = busGroupId;
+    }
+
+    public Boolean getIsPublic() {
+        return isPublic;
+    }
+
+    public void setIsPublic(Boolean isPublic) {
+        this.isPublic = isPublic;
     }
 
     public enum Column {
         id("id", "id", "INTEGER", false),
-        busprojectid("busProjectId", "busprojectid", "INTEGER", false),
-        username("username", "username", "VARCHAR", false);
+        name("name", "name", "VARCHAR", false),
+        description("description", "description", "VARCHAR", false),
+        ctime("ctime", "ctime", "BIGINT", false),
+        utime("utime", "utime", "BIGINT", false),
+        status("status", "status", "INTEGER", false),
+        version("version", "version", "INTEGER", false),
+        busGroupId("bus_group_id", "busGroupId", "INTEGER", false),
+        isPublic("is_public", "isPublic", "BIT", false);
 
         private static final String BEGINNING_DELIMITER = "\"";
 

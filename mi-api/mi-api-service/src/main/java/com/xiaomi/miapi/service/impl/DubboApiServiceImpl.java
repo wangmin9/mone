@@ -91,7 +91,7 @@ public class DubboApiServiceImpl implements DubboApiService {
     private static final Logger LOGGER = LoggerFactory.getLogger(DubboApiServiceImpl.class);
 
     @Override
-    public Result<Map<String, Object>> getDubboApiDetail(Integer userId, Integer projectID, Integer apiID) {
+    public Result<Map<String, Object>> getDubboApiDetail(String username, Integer projectID, Integer apiID) {
         Map<String, Object> map = new HashMap<>();
         Api api = apiMapper.getApiInfo(projectID, apiID);
         if (null == api) {
@@ -130,7 +130,7 @@ public class DubboApiServiceImpl implements DubboApiService {
 
         map.put("mockUrl", String.format(Consts.REQUEST_URL_FORMAT, Consts.MockUrlPrefix + Consts.MockPrefix, md5Location, dubboApiInfo.getApiname()));
 
-        redis.recordRecently10Apis(userId, apiID);
+        redis.recordRecently10Apis(username, apiID);
 
         return Result.success(map);
     }

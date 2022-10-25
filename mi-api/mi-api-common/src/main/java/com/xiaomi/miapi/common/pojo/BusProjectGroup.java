@@ -3,41 +3,63 @@ package com.xiaomi.miapi.common.pojo;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class ProjectFocus {
-    private Integer id;
+public class BusProjectGroup {
+    private Integer groupId;
 
-    private Integer busprojectid;
+    private String groupName;
 
-    private String username;
+    private String groupDesc;
 
-    public Integer getId() {
-        return id;
+    private Boolean status;
+
+    private Integer pubGroup;
+
+    public Integer getGroupId() {
+        return groupId;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setGroupId(Integer groupId) {
+        this.groupId = groupId;
     }
 
-    public Integer getBusprojectid() {
-        return busprojectid;
+    public String getGroupName() {
+        return groupName;
     }
 
-    public void setBusprojectid(Integer busprojectid) {
-        this.busprojectid = busprojectid;
+    public void setGroupName(String groupName) {
+        this.groupName = groupName == null ? null : groupName.trim();
     }
 
-    public String getUsername() {
-        return username;
+    public String getGroupDesc() {
+        return groupDesc;
     }
 
-    public void setUsername(String username) {
-        this.username = username == null ? null : username.trim();
+    public void setGroupDesc(String groupDesc) {
+        this.groupDesc = groupDesc == null ? null : groupDesc.trim();
+    }
+
+    public Boolean getStatus() {
+        return status;
+    }
+
+    public void setStatus(Boolean status) {
+        this.status = status;
+    }
+
+    public Integer getPubGroup() {
+        return pubGroup;
+    }
+
+    public void setPubGroup(Integer pubGroup) {
+        this.pubGroup = pubGroup;
     }
 
     public enum Column {
-        id("id", "id", "INTEGER", false),
-        busprojectid("busProjectId", "busprojectid", "INTEGER", false),
-        username("username", "username", "VARCHAR", false);
+        groupId("group_id", "groupId", "INTEGER", false),
+        groupName("group_name", "groupName", "VARCHAR", false),
+        groupDesc("group_desc", "groupDesc", "VARCHAR", false),
+        status("status", "status", "BIT", false),
+        pubGroup("pub_group", "pubGroup", "INTEGER", false);
 
         private static final String BEGINNING_DELIMITER = "\"";
 

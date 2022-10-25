@@ -7,10 +7,7 @@ import com.xiaomi.miapi.dto.DocumentDTO;
 import com.xiaomi.miapi.service.DocumentService;
 import com.xiaomi.miapi.service.impl.LoginService;
 import com.xiaomi.miapi.util.SessionAccount;
-import com.xiaomi.miapi.common.Consts;
 import com.xiaomi.miapi.common.Result;
-import com.xiaomi.youpin.hermes.service.BusProjectService;
-import org.apache.dubbo.config.annotation.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,9 +37,6 @@ public class DocumentController {
     @Autowired
     private LoginService loginService;
 
-    @Reference(check = false,group = "${ref.hermes.service.group}")
-    private BusProjectService busProjectService;
-
     private static final Logger LOGGER = LoggerFactory.getLogger(DocumentController.class);
 
     /**
@@ -62,21 +56,12 @@ public class DocumentController {
             response.sendError(401, "未登录或者无权限");
             return null;
         }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[DocumentController.addDocument] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
-        }
-        if (!busProjectService.isAboveWork(Consts.PROJECT_NAME, document.getProjectID().longValue(), account.getUsername())) {
-            response.sendError(401, "您没有权限执行此操作");
-            return null;
-        }
-
        if (document.getContentType() == null
                 || (document.getContentType() != 1 && document.getContentType() != 0)) {
             return Result.fail(CommonError.InvalidParamError);
         }
-        document.setUserID(account.getId().intValue());
-        return documentService.addDocument(document, account.getUsername());
+        document.setCreateUserName(account.getUsername());
+        return documentService.addDocument(document);
     }
 
     /**
@@ -96,20 +81,10 @@ public class DocumentController {
             response.sendError(401, "未登录或者无权限");
             return null;
         }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[DocumentController.editDocument] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
-        }
-
-        if (!busProjectService.isAboveWork(Consts.PROJECT_NAME, document.getProjectID().longValue(), account.getUsername())) {
-            response.sendError(401, "您没有权限执行此操作");
-            return null;
-        }
-
         if (document.getDocumentID() == null || !String.valueOf(document.getDocumentID()).matches("^[0-9]{1,11}$")) {
             return Result.fail(CommonError.InvalidParamError);
         }
-        document.setUserID(account.getId().intValue());
+        document.setUpUsername(account.getUsername());
         return this.documentService.editDocument(document,account.getUsername());
     }
 
@@ -129,15 +104,6 @@ public class DocumentController {
         if (null == account) {
             LOGGER.warn("[DocumentController.getAllDocumentList] current user not have valid account info in session");
             response.sendError(401, "未登录或者无权限");
-            return null;
-        }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[DocumentController.getAllDocumentList] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
-        }
-
-        if (!busProjectService.isMember(Consts.PROJECT_NAME, projectID.longValue(), account.getUsername())) {
-            response.sendError(401, "您不是该项目成员");
             return null;
         }
         return this.documentService.getAllDocumentList(projectID);
@@ -161,15 +127,6 @@ public class DocumentController {
         if (null == account) {
             LOGGER.warn("[DocumentController.searchDocument] current user not have valid account info in session");
             response.sendError(401, "未登录或者无权限");
-            return null;
-        }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[DocumentController.searchDocument] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
-        }
-
-        if (!busProjectService.isMember(Consts.PROJECT_NAME, projectID.longValue(), account.getUsername())) {
-            response.sendError(401, "您不是该项目成员");
             return null;
         }
 
@@ -197,10 +154,6 @@ public class DocumentController {
             response.sendError(401, "未登录或者无权限");
             return null;
         }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[DocumentController.getDocument] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
-        }
         return documentService.getDocument(documentID);
     }
 
@@ -221,15 +174,6 @@ public class DocumentController {
             response.sendError(401, "未登录或者无权限");
             return null;
         }
-        if (account.getRole() != Consts.ROLE_ADMIN && account.getRole() != Consts.ROLE_WORK) {
-            LOGGER.warn("[DocumentController.deleteDocuments] not authorized to create project");
-            return Result.fail(CommonError.UnAuthorized);
-        }
-
-        if (!busProjectService.isAboveWork(Consts.PROJECT_NAME, projectID.longValue(), account.getUsername())) {
-            response.sendError(401, "您不是该项目成员");
-            return null;
-        }
 
         List<Integer> documentIDlist = new ArrayList<Integer>();
 
@@ -242,6 +186,6 @@ public class DocumentController {
                 documentIDlist.add(Integer.parseInt(id));
             }
         }
-        return this.documentService.deleteBatchDocument(documentIDlist, projectID, account.getId().intValue(), account.getUsername());
+        return this.documentService.deleteBatchDocument(documentIDlist, projectID, account.getUsername());
     }
 }

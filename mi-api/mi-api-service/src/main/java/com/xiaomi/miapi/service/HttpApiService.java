@@ -26,7 +26,7 @@ public interface HttpApiService {
     public Result<Boolean> manualUpdateHttpApi(ManualHttpUpDTO dto) throws NacosException;
 
     //获取接口信息
-    public Map<String, Object> getHttpApi(Integer userId,Integer projectID, Integer apiID);
+    public Map<String, Object> getHttpApi(String username,Integer projectID, Integer apiID);
 
     Map<String, Object> getBasicHttpApi(Integer projectID, Integer apiID);
 

@@ -8,6 +8,5 @@ public class DubboTestPermissionApplyDTO {
     private String serviceName;
     private String group;
     private String version;
-    private String operator;
-    private Integer userId;
+    private String username;
 }

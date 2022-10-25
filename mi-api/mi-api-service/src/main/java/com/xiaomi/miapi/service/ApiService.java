@@ -17,9 +17,6 @@ public interface ApiService
 
 	public Result<Boolean> editApiDiyExp(Integer apiID,Integer expType,Integer type,String content);
 
-	//移除接口到回收站
-	public boolean removeApi(Integer projectID, String apiID, Integer userID,String username);
-
 	//删除接口
 	public boolean deleteApi(Integer projectID, String apiID, String  username);
 
@@ -40,6 +37,6 @@ public interface ApiService
 	//获取接口历史列表
 	public List<Map<String, Object>> getApiHistoryList(Integer projectID, Integer apiID);
 
-	public List<Api> getRecentlyApiList(Integer userId);
+	public List<Api> getRecentlyApiList(String username);
 
 }

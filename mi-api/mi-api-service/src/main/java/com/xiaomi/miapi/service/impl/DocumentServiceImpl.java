@@ -30,21 +30,18 @@ public class DocumentServiceImpl implements DocumentService {
     @Autowired
     private ProjectOperationLogMapper projectOperationLogMapper;
 
-    @Autowired
-    UserService userService;
-
     /**
      * 添加文档
      */
     @Override
-    public Result<Boolean> addDocument(Document document, String opUsername) {
-        document.setCreateUserName(opUsername);
+    public Result<Boolean> addDocument(Document document) {
+        document.setCreateUserName(document.getCreateUserName());
         if (this.documentMapper.addDocument(document) < 1) {
             return Result.fail(CommonError.UnknownError);
         } else {
             ProjectOperationLog projectOperationLog = new ProjectOperationLog();
             projectOperationLog.setOpProjectID(document.getProjectID());
-            projectOperationLog.setOpUsername(opUsername);
+            projectOperationLog.setOpUsername(document.getCreateUserName());
             projectOperationLog.setOpTarget(ProjectOperationLog.OP_TARGET_PROJECT_DOCUMENT);
             projectOperationLog.setOpTargetID(document.getDocumentID());
             projectOperationLog.setOpType(ProjectOperationLog.OP_TYPE_ADD);
@@ -110,8 +107,8 @@ public class DocumentServiceImpl implements DocumentService {
 
         Map<String, Object> document = documentMapper.getDocument(documentID);
         if (document != null && !document.isEmpty()) {
-            Long userID = (Long) document.get("userID");
-            document.put("creator",userService.getUserById(userID.intValue()).getName());
+            String username = (String) document.get("username");
+            document.put("creator",username);
             return Result.success(document);
         } else {
             return Result.fail(CommonError.InvalidParamError);
@@ -122,7 +119,7 @@ public class DocumentServiceImpl implements DocumentService {
      * 批量删除文档
      */
     @Override
-    public Result<Boolean> deleteBatchDocument(List<Integer> documentIDs, int projectID, int userID,String opUsername) {
+    public Result<Boolean> deleteBatchDocument(List<Integer> documentIDs, int projectID, String opUsername) {
 
         String documentTitles = this.documentMapper.getDocumentTitle(documentIDs);
         if (this.documentMapper.deleteDocuments(documentIDs, projectID) < 1) {

@@ -26,8 +26,7 @@ import java.util.Map;
  */
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackForClassName = "java.lang.Exception")
-public class ApiGroupServiceImp implements ApiGroupService
-{
+public class ApiGroupServiceImp implements ApiGroupService {
 
 	@Autowired
     ApiGroupMapper apiGroupMapper;
@@ -35,15 +34,12 @@ public class ApiGroupServiceImp implements ApiGroupService
     ApiMapper apiMapper;
 	@Autowired
 	ProjectOperationLogMapper projectOperationLogMapper;
-	@Autowired
-	ApiCacheMapper apiCacheMapper;
-
 
 	/**
 	 * 新建分组
 	 */
 	@Override
-	public boolean addApiGroup(ApiGroup apiGroup, String opUsername)
+	public Result<Boolean> addApiGroup(ApiGroup apiGroup, String opUsername)
 	{
 		apiGroup.setSystemGroup(false);
 		int result = apiGroupMapper.addApiGroup(apiGroup);
@@ -60,9 +56,9 @@ public class ApiGroupServiceImp implements ApiGroupService
 			projectOperationLog.setOpType(ProjectOperationLog.OP_TYPE_ADD);
 			projectOperationLog.setOpUsername(opUsername);
 			projectOperationLogMapper.addProjectOperationLog(projectOperationLog);
-			return true;
+			return Result.success(true);
 		} else{
-			return false;
+			return Result.fail(CommonError.UnknownError);
 		}
 	}
 
@@ -71,10 +67,10 @@ public class ApiGroupServiceImp implements ApiGroupService
 	 */
 	@Transactional
 	@Override
-	public Result<Boolean> deleteGroup(Integer projectID, Integer groupID, Integer userID,String username)
+	public Result<Boolean> deleteGroup(Integer projectID, Integer groupID,String username)
 	{
 		ApiGroup apiGroup = apiGroupMapper.getGroupByID(groupID);
-		List<Integer> groupIDS = new ArrayList<Integer>();
+		List<Integer> groupIDS = new ArrayList<>();
 		groupIDS.add(groupID);
 		Date date = new Date();
 		Timestamp nowTime = new Timestamp(date.getTime());
@@ -88,7 +84,6 @@ public class ApiGroupServiceImp implements ApiGroupService
 		if (result > 0)
 		{
 			// 添加操作记录
-//			projectMapper.updateProjectUpdateTime(projectID, nowTime);
 			ProjectOperationLog projectOperationLog = new ProjectOperationLog();
 			projectOperationLog.setOpProjectID(projectID);
 			projectOperationLog.setOpDesc("删除项目分组  '" + apiGroup.getGroupName() + "'");
@@ -118,7 +113,7 @@ public class ApiGroupServiceImp implements ApiGroupService
 	 * 修改分组
 	 */
 	@Override
-	public boolean editGroup(ApiGroup apiGroup,String opUserName)
+	public boolean editGroup(ApiGroup apiGroup)
 	{
 		apiGroup.setSystemGroup(false);
 		int result = apiGroupMapper.editGroup(apiGroup);
@@ -133,39 +128,11 @@ public class ApiGroupServiceImp implements ApiGroupService
 			projectOperationLog.setOpTargetID(apiGroup.getGroupID());
 			projectOperationLog.setOpTime(nowTime);
 			projectOperationLog.setOpType(ProjectOperationLog.OP_TYPE_UPDATE);
-			projectOperationLog.setOpUsername(opUserName);
+			projectOperationLog.setOpUsername(apiGroup.getUsername());
 			projectOperationLogMapper.addProjectOperationLog(projectOperationLog);
 			return true;
 		}
 		else {
-			return false;
-		}
-	}
-
-	/**
-	 * 对分组进行排序
-	 */
-	@Override
-	public boolean sortGroup(Integer projectID, Integer userID, String orderList)
-	{
-		int result = apiGroupMapper.sortGroup(projectID, orderList);
-		if (result > 0)
-		{
-			Date date = new Date();
-			Timestamp nowTime = new Timestamp(date.getTime());
-//			projectMapper.updateProjectUpdateTime(projectID, nowTime);
-			ProjectOperationLog projectOperationLog = new ProjectOperationLog();
-			projectOperationLog.setOpProjectID(projectID);
-			projectOperationLog.setOpDesc("修改项目分组排序");
-			projectOperationLog.setOpTarget(ProjectOperationLog.OP_TARGET_API_GROUP);
-			projectOperationLog.setOpTargetID(projectID);
-			projectOperationLog.setOpTime(nowTime);
-			projectOperationLog.setOpType(ProjectOperationLog.OP_TYPE_UPDATE);
-			projectOperationLog.setOpUsername("dzx");
-			projectOperationLogMapper.addProjectOperationLog(projectOperationLog);
-			return true;
-		}
-		else{
 			return false;
 		}
 	}

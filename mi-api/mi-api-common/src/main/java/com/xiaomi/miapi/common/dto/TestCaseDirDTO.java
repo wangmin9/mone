@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class TestCaseDirDTO {
 
-    private Integer accountId;
+    private String username;
 
     private String name;
 

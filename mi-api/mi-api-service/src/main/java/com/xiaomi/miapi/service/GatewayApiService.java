@@ -13,7 +13,7 @@ public interface GatewayApiService {
 
     public Result<List<Map<String, Object>>> getGatewayApiDetailByUrl(List<UrlDTO> urls);
 
-    public Result<Map<String, Object>> getGatewayApiDetail(Integer userId, Integer projectID, Integer apiID);
+    public Result<Map<String, Object>> getGatewayApiDetail(String username, Integer projectID, Integer apiID);
 
     public Map<String, Object> getBasicGatewayApiDetail(Integer projectID, Integer apiID);
 

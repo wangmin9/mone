@@ -16,6 +16,6 @@ public interface GrpcApiService {
 
     Result<Boolean> updateGrpcApi(UpdateGrpcApiBo updateGrpcApiBo);
 
-    Result<Map<String,Object>> getGrpcApiDetail(int accountID, int projectID, int apiID);
+    Result<Map<String,Object>> getGrpcApiDetail(String username, int projectID, int apiID);
 
 }

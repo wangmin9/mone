@@ -99,11 +99,11 @@ public class RedisUtil {
         }
     }
 
-    public boolean recordRecently10Projects(Integer userId,Integer projectId){
-        if (jedisPool == null || userId == null || projectId == null){
+    public boolean recordRecently10Projects(String username,Integer projectId){
+        if (jedisPool == null || username == null || projectId == null){
             return false;
         }
-        String key = Consts.genRecentlyProjectsKey(userId);
+        String key = Consts.genRecentlyProjectsKey(username);
         Jedis jedis = jedisPool.getResource();
 //        Transaction tx = jedis.multi();
         try {
@@ -123,11 +123,11 @@ public class RedisUtil {
         return true;
     }
 
-    public boolean recordRecently10Apis(Integer userId,Integer apiId){
-        if (jedisPool == null || userId == null || apiId == null){
+    public boolean recordRecently10Apis(String username,Integer apiId){
+        if (jedisPool == null || username == null || apiId == null){
             return false;
         }
-        String key = Consts.genRecentlyApisKey(userId);
+        String key = Consts.genRecentlyApisKey(username);
         Jedis jedis = jedisPool.getResource();
         try {
             List<String> apiIDs = jedis.lrange(key,0,7);

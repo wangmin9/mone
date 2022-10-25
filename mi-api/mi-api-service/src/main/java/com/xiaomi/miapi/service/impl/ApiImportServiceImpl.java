@@ -421,7 +421,6 @@ public class ApiImportServiceImpl implements ApiImportService {
                                 } else {
                                     param.setParamValue(mockService.generateDefaultValue(stringType2IntType(subParamObj.get("type").getAsString())).toString());
                                 }
-//                        param.setParamNote("");
                             } else if ((subParamObj.get("type") != null && subParamObj.get("type").getAsString().equals("array"))) {
                                 //数组
                                 param.setParamType(String.valueOf(stringType2IntType("array")));
@@ -500,7 +499,6 @@ public class ApiImportServiceImpl implements ApiImportService {
                                 } else {
                                     param.setParamValue(mockService.generateDefaultValue(stringType2IntType(subParamObj.get("type").getAsString())).toString());
                                 }
-    //                        param.setParamNote("");
                             } else if ((subParamObj.get("type") != null && subParamObj.get("type").getAsString().equals("array"))) {
                                 //数组
                                 param.setParamType(String.valueOf(stringType2IntType("array")));

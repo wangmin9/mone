@@ -1,3 +1,18 @@
+/*
+ Navicat Premium Data Transfer
+
+ Source Server         : MiApi测试环境
+ Source Server Type    : MySQL
+ Source Server Version : 50726
+ Source Host           :
+ Source Schema         : miapimanager
+
+ Target Server Type    : MySQL
+ Target Server Version : 50726
+ File Encoding         : 65001
+
+ Date: 24/10/2022 18:08:00
+*/
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
@@ -163,6 +178,37 @@ CREATE TABLE `api_test_log` (
 ) ENGINE=InnoDB AUTO_INCREMENT=698 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
+-- Table structure for bus_project
+-- ----------------------------
+DROP TABLE IF EXISTS `bus_project`;
+CREATE TABLE `bus_project` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `name` varchar(100) COLLATE utf8_bin NOT NULL DEFAULT '' COMMENT '项目名',
+  `description` varchar(100) COLLATE utf8_bin NOT NULL DEFAULT '' COMMENT '描述',
+  `ctime` bigint(20) NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `utime` bigint(20) NOT NULL DEFAULT '0' COMMENT '更新时间',
+  `status` int(10) NOT NULL DEFAULT '0' COMMENT '接口状态',
+  `version` int(10) NOT NULL DEFAULT '0' COMMENT '版本',
+  `bus_group_id` int(10) NOT NULL DEFAULT '0' COMMENT '是否公开',
+  `is_public` tinyint(1) DEFAULT '1' COMMENT '是否是公开项目 1 是，0 不是',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `uk_name` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=120633 DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='业务项目表';
+
+-- ----------------------------
+-- Table structure for bus_project_group
+-- ----------------------------
+DROP TABLE IF EXISTS `bus_project_group`;
+CREATE TABLE `bus_project_group` (
+  `group_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `group_name` varchar(255) NOT NULL DEFAULT '' COMMENT '组名',
+  `group_desc` varchar(255) NOT NULL DEFAULT '' COMMENT '描述',
+  `status` tinyint(1) NOT NULL,
+  `pub_group` int(10) NOT NULL DEFAULT '1' COMMENT '是否为公开项目组',
+  PRIMARY KEY (`group_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8 COMMENT='业务项目组';
+
+-- ----------------------------
 -- Table structure for eo_api
 -- ----------------------------
 DROP TABLE IF EXISTS `eo_api`;
@@ -277,7 +323,7 @@ CREATE TABLE `eo_project_document` (
   `content` longtext,
   `title` varchar(255) NOT NULL,
   `updateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `userID` int(10) unsigned NOT NULL,
+  `username` varchar(255) NOT NULL,
   `createUserName` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`documentID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8;
@@ -312,9 +358,9 @@ DROP TABLE IF EXISTS `eo_project_focus`;
 CREATE TABLE `eo_project_focus` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `busProjectId` int(11) NOT NULL,
-  `userId` int(11) NOT NULL,
+  `username` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `项目和用户一个关联` (`busProjectId`,`userId`)
+  UNIQUE KEY `项目和用户一个关联` (`busProjectId`,`username`)
 ) ENGINE=InnoDB AUTO_INCREMENT=190 DEFAULT CHARSET=utf8;
 
 -- ----------------------------

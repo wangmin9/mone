@@ -157,12 +157,12 @@ public final class Consts {
         return interfaceName + ":" + version+ ":" + group;
     }
 
-    public static String genRecentlyProjectsKey(Integer userId){
-        return "mi_api:recently10_projects_"+userId;
+    public static String genRecentlyProjectsKey(String username){
+        return "mi_api:recently10_projects_"+username;
     }
 
-    public static String genRecentlyApisKey(Integer userId){
-        return "mi_api:recently10_apis_"+userId;
+    public static String genRecentlyApisKey(String username){
+        return "mi_api:recently10_apis_"+username;
     }
 
 }

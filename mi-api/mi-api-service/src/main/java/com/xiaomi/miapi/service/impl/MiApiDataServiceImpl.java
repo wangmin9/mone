@@ -14,7 +14,6 @@ import com.xiaomi.mone.dubbo.docs.annotations.ApiModule;
 import com.xiaomi.mone.tpc.api.service.UserOrgFacade;
 import com.xiaomi.mone.tpc.common.param.NullParam;
 import com.xiaomi.mone.tpc.common.vo.OrgInfoVo;
-import com.xiaomi.youpin.hermes.service.BusProjectService;
 import com.xiaomi.youpin.infra.rpc.Result;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -25,9 +24,6 @@ import java.util.*;
 @DubboService(group = "${dubbo.group}",version = "1.0")
 @ApiModule(value = "MiApi的接入数据服务", apiInterface = MiApiDataService.class)
 class MiApiDataServiceImpl implements MiApiDataService {
-
-    @DubboReference(check = false, group = "${ref.hermes.service.group}")
-    private BusProjectService busProjectService;
 
     @Autowired
     private RedisUtil redisUtil;
@@ -48,14 +44,6 @@ class MiApiDataServiceImpl implements MiApiDataService {
     private UserOrgFacade userOrgFacade;
 
     public static final Gson gson = new Gson();
-
-    @Override
-    public Result<MiApiData> getMiApiData() {
-        MiApiData miApiData = new MiApiData();
-        miApiData.setProjectNum(busProjectService.getTotalAmount());
-        miApiData.setApiNum(apiMapper.getApiNum());
-        return Result.success(miApiData);
-    }
 
     @Override
     public Result<Map<String,List<String>>> getMiApiUserData() {
