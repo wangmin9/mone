@@ -1,3 +1,15 @@
+CREATE TABLE `mione_custom_config` (
+  `id` bigint(64) NOT NULL AUTO_INCREMENT,
+  `name` varchar(128) DEFAULT NULL,
+  `content` text DEFAULT NULL,
+  `version` int(32) DEFAULT NULL,
+  `ctime` bigint(64) DEFAULT NULL,
+  `utime` bigint(64) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=210001;
+INSERT INTO `mione_custom_config` VALUES (1, 'tenement', '[{\"label\": \"中国区\", \"value\": \"first_dept\"},{\"label\": \"创新部\", \"value\": \"innov_dept\"}]', 0, 1619434562117, 1619597244732);
+
+
 USE `gateway`;
 
 DROP TABLE IF EXISTS `api_group_info`;
