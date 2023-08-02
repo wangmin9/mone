@@ -1,3 +1,15 @@
+aegis.sdk.public.key=aaaa
+server.http.auth-token-header-name=x-api-key
+server.http.auth-token=aaaa
+server.url=http://test.mi.com
+gateway.default.domain=
+feishu.appSecret=
+feishu.appId=
+server.cas.userInfoPath=
+server.cas.loginUrl=http://XX:80/user-manage/login
+server.cas.logoutUrl=http://XX:80/api-pomission/login/logout
+tpc.tenant.out.id=151003
+
 CREATE TABLE `mione_custom_config` (
   `id` bigint(64) NOT NULL AUTO_INCREMENT,
   `name` varchar(128) DEFAULT NULL,
