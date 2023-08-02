@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mione-gateway
+  namespace: hera-namespace
+  labels:
+    app: mione-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mione-gateway
+  template:
+    metadata:
+      labels:
+        app: mione-gateway
+    spec:
+      containers:
+      - name: mione-gateway-container
+        image: herahub/opensource-pub:mione-gateway-v0.0.1
+        resources:
+          limits:
+            cpu: '500m'
+            memory: 2Gi
