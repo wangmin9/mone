@@ -42,3 +42,6 @@ k8s.st.token=
 k8s.deploy.type=k8s,daemonset,statefulset,grayDeploy,moon
 k8s.st.kc_url=
 k8s.kc_url=
+
+rocketmq.namesrv.addr=
+rocketmq.group=
