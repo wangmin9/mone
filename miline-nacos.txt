@@ -47,3 +47,4 @@ rocketmq.namesrv.addr=
 rocketmq.group=
 
 miline_pipelineStatusChange_st
+MilineConsumerGroupStaging
