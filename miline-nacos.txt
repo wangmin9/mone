@@ -45,3 +45,5 @@ k8s.kc_url=
 
 rocketmq.namesrv.addr=
 rocketmq.group=
+
+miline_pipelineStatusChange_st
