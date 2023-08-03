@@ -49,3 +49,11 @@ tpc.token.parse.url=http://mi-tpclogin.hera-namespace:8098/login/token/parse
 
 miline_pipelineStatusChange_st
 MilineConsumerGroupStaging
+
+
+mone-application-manager
+spring.datasource.url=
+spring.datasource.username=
+spring.datasource.password=
+spring.redis=
+redis.cluster.pwd=
