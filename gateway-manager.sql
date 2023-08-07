@@ -1,15 +1,3 @@
-aegis.sdk.public.key=aaaa
-server.http.auth-token-header-name=x-api-key
-server.http.auth-token=aaaa
-server.url=http://test.mi.com
-gateway.default.domain=
-feishu.appSecret=
-feishu.appId=
-server.cas.userInfoPath=
-server.cas.loginUrl=http://XX:80/user-manage/login
-server.cas.logoutUrl=http://XX:80/api-pomission/login/logout
-tpc.tenant.out.id=151003
-
 CREATE TABLE `mione_custom_config` (
   `id` bigint(64) NOT NULL AUTO_INCREMENT,
   `name` varchar(128) DEFAULT NULL,
@@ -19,7 +7,7 @@ CREATE TABLE `mione_custom_config` (
   `utime` bigint(64) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=210001;
-INSERT INTO `mione_custom_config` VALUES (1, 'tenant', '[{\"label\": \"中国区\", \"value\": \"first_dept\"}]', 0, 1619434562117, 1619597244732);
+INSERT INTO `mione_custom_config` VALUES (1, 'tenant', '[{\"label\": \"测试\", \"value\": \"1\"}]', 0, 1619434562117, 1619597244732);
 
 
 USE `gateway`;
