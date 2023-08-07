@@ -19,23 +19,10 @@ CREATE TABLE `mione_custom_config` (
   `utime` bigint(64) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=210001;
-INSERT INTO `mione_custom_config` VALUES (1, 'tenement', '[{\"label\": \"中国区\", \"value\": \"first_dept\"},{\"label\": \"创新部\", \"value\": \"innov_dept\"}]', 0, 1619434562117, 1619597244732);
+INSERT INTO `mione_custom_config` VALUES (1, 'tenant', '[{\"label\": \"中国区\", \"value\": \"first_dept\"}]', 0, 1619434562117, 1619597244732);
 
 
 USE `gateway`;
-
-DROP TABLE IF EXISTS `api_group_info`;
-CREATE TABLE `api_group_info` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '' COMMENT '分组名称',
-  `description` varchar(1023) COLLATE utf8_bin NOT NULL DEFAULT '' COMMENT '分组描述',
-  `gid` int(11) NOT NULL,
-  `base_url` varchar(512) COLLATE utf8_bin NOT NULL DEFAULT '' COMMENT '分组的基础url',
-  `ctime` bigint(20) NOT NULL COMMENT '创建时间（毫秒）',
-  `utime` bigint(20) NOT NULL COMMENT '更新时间（毫秒）',
-  PRIMARY KEY (`id`),
-  KEY `idx_gid` (`gid`)
-) ENGINE=InnoDB AUTO_INCREMENT=40000042 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 DROP TABLE IF EXISTS `api_info`;
 CREATE TABLE `api_info` (
@@ -211,30 +198,6 @@ CREATE TABLE `gw_user_info` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=40360984 DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='网关分组用户映射表';
 
-DROP TABLE IF EXISTS `metadata`;
-CREATE TABLE `metadata` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '' COMMENT '元数据名称',
-  `description` varchar(1023) COLLATE utf8_bin NOT NULL DEFAULT '' COMMENT '元数据描述',
-  `type` int(11) NOT NULL COMMENT '元数据类型 1-分组集合group_cluster,2-域名domain',
-  `ctime` bigint(20) NOT NULL COMMENT '创建时间（毫秒）',
-  `utime` bigint(20) NOT NULL COMMENT '更新时间（毫秒）',
-  `refer_header` varchar(1024) COLLATE utf8_bin DEFAULT '' COMMENT 'referheader',
-  `tenant` varchar(30) COLLATE utf8_bin DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `idx_type` (`type`)
-) ENGINE=InnoDB AUTO_INCREMENT=30060002 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
-DROP TABLE IF EXISTS `metadata_relation`;
-CREATE TABLE `metadata_relation` (
-  `id` bigint(21) unsigned NOT NULL AUTO_INCREMENT,
-  `source` bigint(21) NOT NULL COMMENT 'source 表主键id,只能是metadata表的主键',
-  `target` bigint(21) NOT NULL COMMENT 'target 表主键id，可以是metadata表的主键或者其他表的主键',
-  `type` int(11) NOT NULL COMMENT '元数据类型 1-group_cluster(metadata):api_gourp;2-group_cluster(metadata):domain(metadata);',
-  PRIMARY KEY (`id`),
-  KEY `idx_key` (`source`,`target`,`type`)
-) ENGINE=InnoDB AUTO_INCREMENT=30030002 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
 DROP TABLE IF EXISTS `mione_auditing`;
 CREATE TABLE `mione_auditing` (
   `id` bigint(64) NOT NULL AUTO_INCREMENT,
@@ -259,18 +222,6 @@ CREATE TABLE `mione_custom_config` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=240047 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
-DROP TABLE IF EXISTS `mione_menu`;
-CREATE TABLE `mione_menu` (
-  `id` bigint(64) unsigned NOT NULL AUTO_INCREMENT,
-  `priority` int(32) DEFAULT NULL,
-  `role` varchar(1024) COLLATE utf8_bin DEFAULT NULL,
-  `menu` text COLLATE utf8_bin,
-  `version` int(32) DEFAULT NULL,
-  `ctime` bigint(64) DEFAULT NULL,
-  `utime` bigint(64) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=150001 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
 DROP TABLE IF EXISTS `operation_log`;
 CREATE TABLE `operation_log` (
   `id` bigint(21) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
@@ -284,90 +235,6 @@ CREATE TABLE `operation_log` (
   `remark` varchar(1000) COLLATE utf8mb4_bin DEFAULT '' COMMENT '备注',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=503679 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
-
-DROP TABLE IF EXISTS `plugin_data`;
-CREATE TABLE `plugin_data` (
-  `id` int(32) NOT NULL AUTO_INCREMENT,
-  `plugin_id` int(32) DEFAULT NULL,
-  `data` mediumblob,
-  `ctime` bigint(64) DEFAULT NULL,
-  `utime` bigint(64) DEFAULT NULL,
-  `version` varchar(128) COLLATE utf8_bin DEFAULT NULL,
-  `stauts` int(32) DEFAULT NULL,
-  `url` varchar(128) COLLATE utf8_bin DEFAULT NULL,
-  `compile_id` bigint(64) DEFAULT NULL,
-  `commit_id` varchar(128) COLLATE utf8_bin DEFAULT NULL,
-  `tenant` varchar(30) COLLATE utf8_bin DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=40000071 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
-DROP TABLE IF EXISTS `plugin_info`;
-CREATE TABLE `plugin_info` (
-  `id` int(32) NOT NULL AUTO_INCREMENT,
-  `name` varchar(128) COLLATE utf8_bin DEFAULT NULL,
-  `data_id` int(32) DEFAULT NULL,
-  `ctime` bigint(64) DEFAULT NULL,
-  `utime` bigint(64) DEFAULT NULL,
-  `status` int(32) DEFAULT NULL,
-  `creator` varchar(128) COLLATE utf8_bin DEFAULT NULL,
-  `desc` varchar(128) COLLATE utf8_bin DEFAULT NULL,
-  `url` varchar(128) COLLATE utf8_bin DEFAULT NULL,
-  `group_info` varchar(200) COLLATE utf8_bin DEFAULT NULL,
-  `project_id` int(11) DEFAULT NULL,
-  `flow_key` varchar(100) COLLATE utf8_bin DEFAULT NULL,
-  `git_group` varchar(128) COLLATE utf8_bin DEFAULT NULL,
-  `git_name` varchar(128) COLLATE utf8_bin DEFAULT NULL,
-  `git_domain` varchar(255) COLLATE utf8_bin DEFAULT 'git.n.xiaomi.com',
-  `tenant` varchar(30) COLLATE utf8_bin DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=40000010 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
-DROP TABLE IF EXISTS `project`;
-CREATE TABLE `project` (
-  `id` int(32) NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) DEFAULT NULL,
-  `desc` varchar(100) DEFAULT NULL,
-  `ctime` bigint(64) DEFAULT NULL,
-  `utime` bigint(64) DEFAULT NULL,
-  `status` int(32) DEFAULT NULL,
-  `gitAddress` varchar(200) DEFAULT NULL,
-  `version` int(32) DEFAULT NULL,
-  `git_group` varchar(128) DEFAULT NULL,
-  `git_name` varchar(128) DEFAULT NULL,
-  `deploy_limit` int(32) NOT NULL DEFAULT '3',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
-
-DROP TABLE IF EXISTS `tesla_ds`;
-CREATE TABLE `tesla_ds` (
-  `id` int(32) NOT NULL AUTO_INCREMENT,
-  `type` int(32) DEFAULT NULL,
-  `driver_class` varchar(128) COLLATE utf8_bin DEFAULT NULL,
-  `data_source_url` varchar(256) COLLATE utf8_bin DEFAULT NULL,
-  `user_name` varchar(128) COLLATE utf8_bin DEFAULT NULL,
-  `pass_wd` varchar(128) COLLATE utf8_bin DEFAULT NULL,
-  `pool_size` int(32) DEFAULT NULL,
-  `max_pool_size` int(32) DEFAULT NULL,
-  `min_pool_size` int(32) DEFAULT NULL,
-  `name` varchar(128) COLLATE utf8_bin DEFAULT NULL,
-  `state` int(32) DEFAULT NULL,
-  `ctime` bigint(64) DEFAULT NULL,
-  `utime` bigint(64) DEFAULT NULL,
-  `creator` varchar(128) COLLATE utf8_bin DEFAULT NULL,
-  `jar_path` varchar(128) COLLATE utf8_bin DEFAULT NULL,
-  `ioc_package` varchar(128) COLLATE utf8_bin DEFAULT NULL,
-  `app_name` varchar(128) COLLATE utf8_bin DEFAULT NULL,
-  `reg_address` varchar(128) COLLATE utf8_bin DEFAULT NULL,
-  `redis_type` varchar(128) COLLATE utf8_bin DEFAULT NULL,
-  `nacos_data_id` varchar(128) COLLATE utf8_bin DEFAULT NULL,
-  `nacos_group` varchar(128) COLLATE utf8_bin DEFAULT NULL,
-  `mongo_database` varchar(128) COLLATE utf8_bin DEFAULT NULL,
-  `description` varchar(400) COLLATE utf8_bin DEFAULT NULL,
-  `api_package` varchar(128) COLLATE utf8_bin DEFAULT NULL,
-  `threads` int(32) DEFAULT NULL,
-  `tenement` varchar(30) COLLATE utf8_bin DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=40000011 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 DROP TABLE IF EXISTS `user_collection`;
 CREATE TABLE `user_collection` (
