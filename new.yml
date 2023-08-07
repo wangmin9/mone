@@ -1,65 +1,132 @@
-app: mione-miline-fe
-    spec:
-      containers:
-        - name: mione-miline-container
-          image: herahub/opensource-pub:mione-miline-v0.0.6
-          env:
-            - name: LANG
-              value: C.UTF-8
-          resources:
-            limits:
-              cpu: 500m
-              memory: 2Gi
-          terminationMessagePath: /dev/termination-log
-          terminationMessagePolicy: File
-          imagePullPolicy: IfNotPresent
-        - name: mione-miline-fe-container
-          image: herahub/opensource-pub:mione-miline-fe-v0.0.5
-
-app: mione-application
-    spec:
-      containers:
-        - name: mione-application-container
-          image: herahub/opensource-pub:mione-application-manager-v0.0.3
-
-app: mi-tpc
-    spec:
-      containers:
-        - name: mi-tpc-container
-          image: herahub/opensource-pub:mi-tpc-v3
-
-app: mione-gateway
-    spec:
-      containers:
-        - name: mione-gateway-container
-          image: herahub/opensource-pub:mione-gateway-v0.0.4
-
+1、miline前后端
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mione-miline-fe
+  namespace: hera-namespace
+  labels:
+    app: mione-miline-fe
 spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mione-miline-fe
+  template:
+    metadata:
+      labels:
+        app: mione-miline-fe
+    spec:
       containers:
-        - name: mione-gateway-manager-container
-          image: herahub/opensource-pub:mione-gateway-manager-v0.1.1
-          resources:
-            limits:
-              cpu: 500m
-              memory: 2Gi
-          terminationMessagePath: /dev/termination-log
-          terminationMessagePolicy: File
-          imagePullPolicy: IfNotPresent
-        - name: mione-gateway-manager-fe-container
-          image: herahub/opensource-pub:mione-gateway-manager-fe-v0.0.5
+      - name: mione-miline-container
+        image: herahub/opensource-pub:mione-miline-v0.0.6
+        env:
+          - name: LANG
+            value: C.UTF-8
+        resources:
+          limits:
+            cpu: '500m'
+            memory: 2Gi
 
+      - name: mione-miline-fe-container
+        image: herahub/opensource-pub:mione-miline-fe-v0.0.5
+        resources:
+          limits:
+            cpu: '300m'
+            memory: 1Gi
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mione-miline-fe
+  namespace: hera-namespace
+  labels:
+    app: mione-miline-fe
 spec:
   ports:
-    - protocol: TCP
-      port: 7001
-      targetPort: 7001
-  selector:
-    app: mione-gateway-manager-fe
-
-ports:
-    - protocol: TCP
-      port: 7002
+    - port: 7002
       targetPort: 7002
+      protocol: TCP
   selector:
     app: mione-miline-fe
+  clusterIP: None
+
+  2、网关manager前后端
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mione-gateway-manager-fe
+  namespace: hera-namespace
+  labels:
+    app: mione-gateway-manager-fe
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mione-gateway-manager-fe
+  template:
+    metadata:
+      labels:
+        app: mione-gateway-manager-fe
+    spec:
+      containers:
+      - name: mione-gateway-manager-container
+        image: herahub/opensource-pub:mione-gateway-manager-v0.1.1
+        env:
+          - name: LANG
+            value: C.UTF-8
+        resources:
+          limits:
+            cpu: '500m'
+            memory: 2Gi
+      - name: mione-gateway-manager-fe-container
+        image: herahub/opensource-pub:mione-gateway-manager-fe-v0.0.5
+        resources:
+          limits:
+            cpu: '300m'
+            memory: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mione-gateway-manager-fe
+  namespace: hera-namespace
+  labels:
+    app: mione-gateway-manager-fe
+spec:
+  ports:
+    - port: 7001
+      targetPort: 7001
+      protocol: TCP
+  selector:
+    app: mione-gateway-manager-fe
+  clusterIP: None
+
+  3、tesla
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mione-gateway
+  namespace: hera-namespace
+  labels:
+    app: mione-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mione-gateway
+  template:
+    metadata:
+      labels:
+        app: mione-gateway
+    spec:
+      containers:
+      - name: mione-gateway-container
+        image: herahub/opensource-pub:mione-gateway-v0.0.4
+        env:
+          - name: LANG
+            value: C.UTF-8
+        resources:
+          limits:
+            cpu: '500m'
+            memory: 2Gi
