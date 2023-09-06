@@ -8,7 +8,7 @@
 * A lightweight microservices development framework. It can be embedded into the Spring framework.
 * Features: Compliant with Java standards, lightweight, no unnecessary libraries, low memory footprint, fast service
   requests, high maintainability, and supports plugin extensions.
-* 支持IOC、AOP，提供mysql、dubbo、redis、nacos、rocketmq、sentinel Waiting for plugins
+* support IOC、AOP，provider mysql、dubbo、redis、nacos、rocketmq、sentinel Waiting for plugins
 * Supports IOC and AOP, offers plugins for MySQL, Dubbo, Redis, Nacos, RocketMQ, Sentinel, and more.
 * User Manual：
 *         <dependency>
