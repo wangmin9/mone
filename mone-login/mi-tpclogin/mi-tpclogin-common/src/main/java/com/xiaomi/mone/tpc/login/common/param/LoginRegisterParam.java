@@ -18,6 +18,8 @@ public class LoginRegisterParam extends BaseParam {
     private String password;
     private String name;
 
+    private String registerCode;
+
     @Override
     public boolean argCheck() {
         if (StringUtils.isBlank(getAccount())) {
@@ -29,9 +31,13 @@ public class LoginRegisterParam extends BaseParam {
         if (StringUtils.isBlank(name)) {
             return false;
         }
+        if (StringUtils.isBlank(registerCode)) {
+            return false;
+        }
         if (type == null || AccountTypeEnum.getEnum(type) == null) {
             return false;
         }
+
         return true;
     }
 }
