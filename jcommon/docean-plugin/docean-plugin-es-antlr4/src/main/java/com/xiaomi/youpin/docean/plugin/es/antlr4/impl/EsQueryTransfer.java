@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  * @date 2023/8/3 17:25
  */
 public class EsQueryTransfer implements EsQueryListener {
-    //波浪线
+    //Wavy lines
     private static final String WAVY_LINE_MARK = "~";
 
     private static final String DOUBLE_QUOTATION_MARK = "\"";
@@ -93,7 +93,7 @@ public class EsQueryTransfer implements EsQueryListener {
 
     @Override
     public void exitNotExpression(EsQueryParser.NotExpressionContext ctx) {
-        //获取到括号内得表达式
+        //Get the expression in parentheses
         //注：“非”逻辑不论包含多少参数都需加上括号，NOT(a:1)、 NOT(a : 1 AND b : 2)
         if ("not".equals(ctx.children.get(0).getText()) || "NOT".equals(ctx.children.get(0).getText())) {
             ParseTree tree = ctx.children.get(1);
@@ -210,7 +210,7 @@ public class EsQueryTransfer implements EsQueryListener {
         ValueContext value = valueProperty.get(ctx.getChild(2));
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         if (null == value) {
-            //不区分field
+            //Field-indiscriminate
             boolQueryBuilder.filter(QueryBuilders.queryStringQuery(param));
         } else {
             switch (value.getType()) {
@@ -356,7 +356,6 @@ public class EsQueryTransfer implements EsQueryListener {
     @Override
     public void exitArray(EsQueryParser.ArrayContext ctx) {
         List<ParseTree> children = ctx.children;
-        //ArrayList<Object> arr = new ArrayList<>();
         List<Object> list = children.stream().filter(x -> x.getChildCount() >= 1).map(x -> valueProperty.get(x).getValue()).collect(Collectors.toList());
         valueProperty.put(ctx, new ValueContext(ValueTypeEnum.ARRAY, list));
     }
@@ -534,7 +533,7 @@ public class EsQueryTransfer implements EsQueryListener {
     @Override
     public void exitIdentifierValue(EsQueryParser.IdentifierValueContext ctx) {
         if (ctx.getParent() instanceof EsQueryParser.EqExprContext) {
-            //属于等于下的值
+            //Belongs to the value that is equal to the following
             valueProperty.put(ctx, new ValueContext(ValueTypeEnum.EQUAL, ctx.getChild(0).getText()));
         } else if (ctx.getParent() instanceof EsQueryParser.NeExprContext) {
             valueProperty.put(ctx, new ValueContext(ValueTypeEnum.IDENTIFY, ctx.getChild(0).getText()));

@@ -34,11 +34,12 @@ public enum LogTypeEnum {
     ORIGIN_LOG(9, "原始格式日志", 6, 1, "向固定的topic中写入原始数据,hera不消费"),
     FREE(0, "自定义日志", 7, 1, "单行采集，按文件的每一行采集成一列");
 
+
     private final Integer type;
     private final String typeName;
     private final Integer sort;
     /**
-     * 支持自己生产自己消费
+     * Support self-production and self-consumption
      */
     private final Integer supportedConsume;
     private final String describe;

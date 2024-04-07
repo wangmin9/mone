@@ -15,8 +15,6 @@
  */
 package com.xiaomi.mone.log.manager.service.bind;
 
-import com.xiaomi.mone.log.api.enums.LogTypeEnum;
-
 /**
  * @author wtt
  * @version 1.0
@@ -25,7 +23,7 @@ import com.xiaomi.mone.log.api.enums.LogTypeEnum;
  */
 public interface LogTypeProcessor {
     /**
-     * 是否支持消费
+     * Whether consumption is supported
      *
      * @param logTypeCode
      * @return
